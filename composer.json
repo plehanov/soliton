@@ -1,0 +1,24 @@
+{
+    "name": "ortus/soliton",
+    "description": "Multi curl composer application",
+    "homepage": "http://gitlab.dev/ortus/soliton",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Plehanov Valentin",
+            "email": "plehanov.v@gmail.com",
+            "homepage": "http://plehanov.su",
+            "role": "Lead Developer"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-0": {"Soliton": "src/"}
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "master"
+        }
+    }
+}

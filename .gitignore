@@ -1,0 +1,7 @@
+.sonar
+.idea
+sonar.sh
+/report
+phpunit.phar
+/public_html
+vendor/
