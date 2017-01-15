@@ -72,7 +72,7 @@ class Query
      */
     public function __construct($alias, $options)
     {
-        foreach ($options as $option => $value) {
+        foreach ((array)$options as $option => $value) {
             if (property_exists($this, $option)) {
                 $this->{$option} = $value;
             }

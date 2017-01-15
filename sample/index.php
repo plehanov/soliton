@@ -1,6 +1,6 @@
 <?php
 /**
- * Created by PhpStorm.
+ * Experiments, test file
  * User: takamura
  * Date: 14.01.15
  * Time: 13:45
