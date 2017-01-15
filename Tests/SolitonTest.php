@@ -17,7 +17,7 @@ class SolitonTest extends PHPUnit_Framework_TestCase
             // $response->setErrorMessage('1');
         };
 
-        $url = 'http://test.server.dev';
+        $url = 'http://localhost:8080';
         $queries = [
             'data0' => [
                 'url' => $url . '/server.php?',
@@ -69,7 +69,7 @@ class SolitonTest extends PHPUnit_Framework_TestCase
     public function testExceptionTime()
     {
         try {
-            $url = 'http://test.server.dev';
+            $url = 'http://localhost:8080';
             $queries = [
                 'data2' => [
                     'url' => $url . '/server.php?thread1=2',
@@ -89,7 +89,7 @@ class SolitonTest extends PHPUnit_Framework_TestCase
     public function testExceptionLoop()
     {
         try {
-            $url = 'http://test.server.dev';
+            $url = 'http://localhost:8080';
             $queries = [
                 'data4' => [
                     'url' => $url . '/server.php',
@@ -113,7 +113,7 @@ class SolitonTest extends PHPUnit_Framework_TestCase
 
     public function testRequest()
     {
-        $url = 'http://test.server.dev';
+        $url = 'http://localhost:8080';
         $queries = [
             'data4' => [
                 'url' => $url . '/server.php',
@@ -135,7 +135,7 @@ class SolitonTest extends PHPUnit_Framework_TestCase
 
     public function testResponse()
     {
-        $url = 'http://test.server.dev';
+        $url = 'http://localhost:8080';
         $queries = [
             'data4' => [
                 'url' => $url . '/server.php',

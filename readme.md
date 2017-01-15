@@ -10,6 +10,14 @@ I wanted to write something for fun. Until I put a more reasonable explanation h
     include_once '../src/Soliton/Helper.php';
     include_once '../src/Soliton/Soliton.php';
 ```
+## Testing
+
+```php
+php -S localhost:8080 sample/ 
+phpunit
+```
+
+
 
 ## Usage
 
@@ -74,7 +82,7 @@ I wanted to write something for fun. Until I put a more reasonable explanation h
     use \Soliton\Helper as H;
     
     $before_account = function(\Soliton\Query $query, $responses) {
-        /** @var \Soliton\Response $response * /
+        /** @var \Soliton\Response $response */
         $response = $responses['login'];
         if ($response->isCorrect()) {
             $data = $response->getData();
@@ -141,7 +149,7 @@ I wanted to write something for fun. Until I put a more reasonable explanation h
         ->timeout(1000)
         ->get(['account']);
     
-    /** @var \Soliton\Response $acc * /
+    /** @var \Soliton\Response $acc */
     $result = $data['account'];
     var_dump($result->getDetailConnection());
 ```
