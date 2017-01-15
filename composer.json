@@ -1,7 +1,7 @@
 {
-    "name": "ortus/soliton",
+    "name": " plehanov/soliton",
     "description": "Multi curl composer application",
-    "homepage": "http://gitlab.dev/ortus/soliton",
+    "homepage": "http://github.com/plehanov/soliton",
     "type": "library",
     "license": "MIT",
     "authors": [
