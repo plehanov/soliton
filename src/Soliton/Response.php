@@ -1,4 +1,11 @@
-<?php namespace Soliton;
+<?php
+/**
+ * User: Valentin Plehanov (Takamura) valentin@plehanov.su
+ * Date: 19.02.15
+ * Time: 17:12
+ */
+
+namespace Soliton;
 
 /**
  * Class Response

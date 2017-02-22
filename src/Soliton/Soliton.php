@@ -1,7 +1,16 @@
-<?php namespace Soliton;
+<?php
+/**
+ * User: Valentin Plehanov (Takamura) valentin@plehanov.su
+ * Date: 19.02.15
+ * Time: 17:12
+ */
+
+
+namespace Soliton;
 
 include_once 'Query.php';
 include_once 'Response.php';
+include_once 'Common.php';
 
 /**
  * Class Soliton
@@ -99,7 +108,7 @@ class Soliton
     }
 
     /**
-     * @return $this
+     * @return void
      * @throws \Exception
      */
     private function run()
@@ -407,7 +416,7 @@ class Soliton
             $options[CURLOPT_POSTFIELDS] = [];
         }
         $files = $query->getFiles();
-        static::prepareFiles($files, $options);
+        Common::prepareFiles($files, $options);
 
         curl_setopt_array($channel, $options);
         return $channel;
@@ -423,83 +432,13 @@ class Soliton
             // пакуем опции если они переданны в виде массива
             if (isset($options[CURLOPT_POSTFIELDS]) && is_array($options[CURLOPT_POSTFIELDS])) {
                 $arr = [];
-                static::convertToStringArray('', $options[CURLOPT_POSTFIELDS], $arr);
+                Common::convertToStringArray('', $options[CURLOPT_POSTFIELDS], $arr);
                 $options[CURLOPT_POSTFIELDS] = $arr;
             }
         }
         return $options;
     }
 
-    /**
-     * @param array $files
-     * @param array $options
-     */
-    private static function prepareFiles(array $files, array &$options)
-    {
-        if (count($files)) {
-            foreach ($files as $key => $dataOfFile) {
-                if (is_array($dataOfFile['name'])) {
-                    $options = static::setRequestFiles($options, $key, $dataOfFile);
-                } else {
-                    $options = static::setRequestFile($options, $key, $dataOfFile);
-                }
-            }
-        }
-    }
-
-    /**
-     * Добавляет в массив упакованную строку с данными о файле для курла.
-     * На вход получает массив со сведениями о файле формата $_FILES.
-     *
-     * @param array $options
-     * @param string $key
-     * @param array $file
-     * @return array
-     */
-    private static function setRequestFile(array $options, $key, array $file)
-    {
-        if ($file['error'] === 0) {
-            $options[CURLOPT_POSTFIELDS][$key] = new \CURLFile($file['tmp_name'], $file['type'], $file['name']);
-        }
-        return $options;
-    }
-
-    /**
-     * Добавляет в массив упакованную строку с данными о файлах для курла.
-     * На вход получает массив со сведениями о файле формата $_FILES.
-     *
-     * @param array $options
-     * @param string $key
-     * @param array $files
-     * @return array
-     */
-    private static function setRequestFiles(array $options, $key, array $files)
-    {
-        foreach ($files['name'] as $index => $tmp) {
-            if ($files['error'][$index] === 0) {
-                $options[CURLOPT_POSTFIELDS]["{$key}[{$index}]"]
-                    = new \CURLFile($files['tmp_name'][$index], $files['type'][$index], $files['name'][$index]);
-            }
-        }
-        return $options;
-    }
-
-    /**
-     * @param string $inputKey
-     * @param array $inputArray
-     * @param array $resultArray
-     */
-    private static function convertToStringArray($inputKey, $inputArray, &$resultArray)
-    {
-        foreach ($inputArray as $key => $value) {
-            $tmpKey = (bool)$inputKey ? $inputKey."[$key]" : $key;
-            if (is_array($value)) {
-                static::convertToStringArray($tmpKey, $value, $resultArray);
-            } else {
-                $resultArray[$tmpKey] = $value;
-            }
-        }
-    }
 
     /**
      * @param string $alias

@@ -1,11 +1,13 @@
-<?php namespace Soliton;
-
+<?php
 /**
- * Created by PhpStorm.
- * User: takamura
+ * User: Valentin Plehanov (Takamura) valentin@plehanov.su
  * Date: 19.02.15
  * Time: 17:12
- *
+ */
+
+namespace Soliton;
+
+/**
  * Class Helper
  * @package Soliton
  */
