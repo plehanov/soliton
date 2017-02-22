@@ -81,7 +81,7 @@ class Common
      */
     protected static function setRequestFiles(array $options, $key, array $files)
     {
-        foreach ($files['name'] as $index => $tmp) {
+        foreach (array_keys($files['name']) as $index) {
             if ($files['error'][$index] === 0) {
                 $options[CURLOPT_POSTFIELDS]["{$key}[{$index}]"]
                     = new \CURLFile($files['tmp_name'][$index], $files['type'][$index], $files['name'][$index]);

@@ -10,20 +10,20 @@ use \Soliton\Helper as H;
 class SolitonTest extends PHPUnit_Framework_TestCase
 {
 
-    protected $server_url = 'http://localhost:8080';
+    protected $serverUrl = 'http://localhost:8080';
 
     public function testSoliton()
     {
-        $func = function(\Soliton\Query $query, $responses) {
-            // var_dump($responses);
-        };
-        $funcA = function(\Soliton\Response $response) {
-            // $response->setErrorMessage('1');
-        };
+//        $func = function(\Soliton\Query $query, $responses) {
+//            // var_dump($responses);
+//        };
+//        $funcA = function(\Soliton\Response $response) {
+//            // $response->setErrorMessage('1');
+//        };
 
         $queries = [
             'data0' => [
-                H::URL => $this->server_url,
+                H::URL => $this->serverUrl,
                 H::METHOD => 'POST',
                 H::GET_PARAMS => ['sleep' => 400000],
                 H::OPTIONS => [
@@ -34,29 +34,29 @@ class SolitonTest extends PHPUnit_Framework_TestCase
                 'before_func' => null,
             ],
             'data2' => [
-                H::URL => $this->server_url . '?thread1=2',
+                H::URL => $this->serverUrl . '?thread1=2',
                 'method_params' => ['sleep' => 480000]
             ],
             'data1' => [
-                H::URL => $this->server_url,
+                H::URL => $this->serverUrl,
                 H::METHOD => 'POST',
                 H::GET_PARAMS => ['sleep' => 200000],
                 H::DEPENDENCY => ['data0', 'data2'],
-                H::FUNC_BEFORE => $func,
-                H::FUNC_AFTER => $funcA,
+//                H::FUNC_BEFORE => $func,
+//                H::FUNC_AFTER => $funcA,
             ],
             /*'data3' => [
-                H::URL => $this->server_url,
+                H::URL => $this->serverUrl,
                 H::DEPENDENCY => ['data1'],
                 H::GET_PARAMS => ['sleep' => 50000]
             ],
             'data4' => [
-                H::URL => $this->server_url,
+                H::URL => $this->serverUrl,
                 H::DEPENDENCY => ['data3'],
                 H::GET_PARAMS => ['sleep' => 100000]
             ],
             'data5' => [
-                H::URL => $this->server_url,
+                H::URL => $this->serverUrl,
                 H::DEPENDENCY => ['data4'],
                 H::GET_PARAMS => ['sleep' => 200000]
             ],*/
@@ -74,12 +74,12 @@ class SolitonTest extends PHPUnit_Framework_TestCase
         try {
             $queries = [
                 'data4' => [
-                    H::URL => $this->server_url,
+                    H::URL => $this->serverUrl,
                     H::DEPENDENCY => ['data5'],
                     H::GET_PARAMS => ['sleep' => 100000]
                 ],
                 'data5' => [
-                    H::URL => $this->server_url,
+                    H::URL => $this->serverUrl,
                     H::DEPENDENCY => ['data4'],
                     H::GET_PARAMS => ['sleep' => 200000]
                 ],
@@ -97,7 +97,7 @@ class SolitonTest extends PHPUnit_Framework_TestCase
     {
         $queries = [
             'data4' => [
-                H::URL => $this->server_url,
+                H::URL => $this->serverUrl,
                 H::GET_PARAMS => ['sleep' => 1000],
                 H::CONNECTION => true,
             ]
@@ -118,18 +118,18 @@ class SolitonTest extends PHPUnit_Framework_TestCase
     {
         $queries = [
             'data4' => [
-                H::URL => $this->server_url,
+                H::URL => $this->serverUrl,
                 H::DEPENDENCY => [],
                 H::GET_PARAMS => ['sleep' => 100000],
                 H::CONNECTION => true,
             ],
             'data5' => [
-                H::URL => $this->server_url,
+                H::URL => $this->serverUrl,
                 H::DEPENDENCY => ['data4'],
                 H::GET_PARAMS => ['sleep' => 200000],
             ],
             'data6' => [
-                H::URL => $this->server_url,
+                H::URL => $this->serverUrl,
                 H::DEPENDENCY => ['data4'],
                 H::GET_PARAMS => ['sleep' => 200000],
                 H::CONNECTION => true,
