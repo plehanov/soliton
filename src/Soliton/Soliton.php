@@ -136,26 +136,26 @@ class Soliton
     }
 
     /**
-     * @param array $needAliases - if empty then return all
-     * @param array $presentAliases - resent responses aliases
+     * @param array $needAliases - необходимые завпросы
+     * @param array $presentAliases - имеющиеся ответы на запросы, готовые
      * @return array
      * @throws \Exception
      */
     private function separator(array $needAliases = [], array $presentAliases = [])
     {
         $groups = [];
-        $req = $this->queries;
+        $queries = $this->queries;
         // максимальное кол-во итераций равно кол-ву элементов всего
-        $total = count($req);
+        $total = count($this->queries);
         $cnt = 0;
 
         for ($index = 0; $index < $total && $cnt < $total; $index++) {
             $newGroup = [];
             /** @var Query $query */
-            foreach ($req as $alias => $query) {
+            foreach ($this->queries as $alias => $query) {
                 if (
                     in_array($alias, $needAliases)
-                    && ! $this->checkDependency($query->getDependency($presentAliases), $groups)
+                    && ! $this->presentNeededDependency($query->getDependency($presentAliases), $groups)
                 ) {
                     // Этот элемент еще рано добавлять в круг - ничего не делаем. Есть зависимости но не все в кругах
                 } else {
@@ -163,7 +163,7 @@ class Soliton
                         $newGroup[] = $alias;
                     }
                     $cnt++;
-                    unset($req[$alias]);
+                    unset($queries[$alias]);
                 }
             }
             if (count($newGroup) > 0) {
@@ -171,16 +171,16 @@ class Soliton
             }
         }
 
-        if (count($req) > 0) {
-            $aliases = implode(', ', array_keys($req));
+        if (count($queries) > 0) {
+            $aliases = implode(', ', array_keys($queries));
             throw new \Exception('Mistakes in dependencies or Loop requests: ' . $aliases, 69);
         }
         return $groups;
     }
 
     /**
-     * @param array $aliases
-     * @param array $presentAliases -  present responses aliases
+     * @param array $aliases требуемые к исполнению запросы
+     * @param array $presentAliases - имеющиеся ответы, запросы выполнять не надо
      * @return array
      */
     private function getChainDependencies(array $aliases, array $presentAliases)
@@ -210,11 +210,12 @@ class Soliton
     }
 
     /**
+     * Удостоверяет что все требуемые зависимости присутсвуют в группах
      * @param array $dependencies проверяемые зависимости
      * @param array $groups круги в которых проверяем наличие запросов от которых зависим
      * @return bool
      */
-    private function checkDependency(array $dependencies, array $groups)
+    private function presentNeededDependency(array $dependencies, array $groups)
     {
         $presentCounter = 0;
         if (count($dependencies) > 0) {
@@ -263,16 +264,14 @@ class Soliton
         $cnt = count($group);
 
         if ($cnt !== 0) {
-            if ((int)$groupTime >= 0) { // Блокирую выполнение если нет времени на эту операцию
-                if ($cnt === 1) {
-                    $this->curlOne($group[0], $groupTime);
-                } else {
-                    $this->curlMany($group, $groupTime);
-                }
-            } else { //Если залочил то необходимо создать пустышки. Что-бы after callback отработал
-                foreach ($group as $alias) {
-                    $this->createErrorResponse($alias, 'Previous loop timed out');
-                }
+            // Блокирую выполнение если нет времени на эту операцию
+            if ((int)$groupTime <= 0) {
+                // Если залочил то необходимо создать пустышки. Что-бы after callback отработал
+                $this->createErrorResponse($group, 'Previous loop timed out');
+            } elseif ($cnt === 1) {
+                $this->curlOne($group[0], $groupTime);
+            } elseif ($cnt > 1) {
+                $this->curlMany($group, $groupTime);
             }
             // Отрабатываем after callback
             $this->executeQueriesAfter($group);
@@ -291,15 +290,14 @@ class Soliton
 
             // Результаты всех зависимостей должны быть корректны.
             $responsesArray = $this->getResponses($query->getDependency());
+
             if (count($responsesArray) === count($query->getDependency())) {
                 $query->runBeforeFunc($responsesArray, $alias);
             } else {
                 // Если запрос не будет выполнен то необходимо добавить Response с ошибкой.
                 $query->setExecutable(false);
-
                 $needResponses = array_diff($aliases, array_keys($responsesArray));
-                $msg = 'Not all depending on compliance. Incorrect queries: ' . implode(', ', $needResponses);
-                $this->createErrorResponse($alias, $msg);
+                $this->createErrorResponse($alias, 'Not all depending on compliance. Incorrect queries: ' . implode(', ', $needResponses));
             }
         }
     }
@@ -368,11 +366,16 @@ class Soliton
     }
 
     /**
-     * @param string $alias
+     * @param string|array $alias
      * @param string $message
      */
     private function createErrorResponse($alias, $message)
     {
+        if (is_array($alias)) {
+            foreach ($alias as $item) {
+                $this->createErrorResponse($item, $message);
+            }
+        }
         $response = $this->responses[$alias] = new Response();
         $response->setErrorMessage($message);
     }
