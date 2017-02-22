@@ -127,18 +127,18 @@ var_dump($acc->getDetailConnection());
 /* --------------------------------------------------------------------------------- Sample */
 $query = [
     'test1' => [
-        H::P_URL => 'http://test.server.dev/server.php?',
-        H::P_METHOD => 'POST',
-        H::P_CONNECTION => true,
-//        H::P_HEADER => true,
-        H::P_GET_PARAMS => ['sleep' => 500000, 'data' => 'files'] //ms
+        H::URL => 'http://test.server.dev/server.php?',
+        H::METHOD => 'POST',
+        H::CONNECTION => true,
+//        H::HEADER => true,
+        H::GET_PARAMS => ['sleep' => 500000, 'data' => 'files'] //ms
     ],
     'test1a' => [
-        H::P_URL => 'http://test.server.dev/server.php?',
-        H::P_METHOD => 'POST',
-        H::P_CONNECTION => true,
-//        H::P_HEADER => true,
-        H::P_GET_PARAMS => ['sleep' => 500000, 'data' => 'files']
+        H::URL => 'http://test.server.dev/server.php?',
+        H::METHOD => 'POST',
+        H::CONNECTION => true,
+//        H::HEADER => true,
+        H::GET_PARAMS => ['sleep' => 500000, 'data' => 'files']
     ],
    /* 'test2a' => [
         'url' => 'https://javabox.dev:9000/api-signin',
@@ -205,17 +205,17 @@ var_dump(
 /*
 $queries = [
     'data0' => [
-        \Soliton\Helper::P_URL => 'http://test2.server.dev/server.php?',
-        \Soliton\Helper::P_METHOD => 'POST',
-        \Soliton\Helper::P_CONNECTION => true,
-        \Soliton\Helper::P_HEADER => true,
-        \Soliton\Helper::P_GET_PARAMS => ['sleep' => 4, 'data' => 'files'],
-        \Soliton\Helper::P_OPTIONS => [
-            \Soliton\Helper::P_OPTIONS_POSTFIELDS => [
+        \Soliton\Helper::URL => 'http://test2.server.dev/server.php?',
+        \Soliton\Helper::METHOD => 'POST',
+        \Soliton\Helper::CONNECTION => true,
+        \Soliton\Helper::HEADER => true,
+        \Soliton\Helper::GET_PARAMS => ['sleep' => 4, 'data' => 'files'],
+        \Soliton\Helper::OPTIONS => [
+            \Soliton\Helper::OPTIONS_POSTFIELDS => [
                 'value' => 1
             ],
         ],
-        //Soliton\Helper::P_FUNC_BEFORE => $beforeAccount,
+        //Soliton\Helper::FUNC_BEFORE => $beforeAccount,
     ],
     'data1' => [
         'url' => 'http://test.server.dev/server.php?',

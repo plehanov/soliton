@@ -16,16 +16,16 @@ class Helper
      * Константы полей которые можно использовать в запросах к солитону
      */
     const
-        P_URL = 'url',
-        P_HEADER = 'loading_headers',
-        P_CONNECTION = 'detail_connection',
-        P_METHOD = 'method_type',
-        P_DEPENDENCY = 'dependency',
-        P_FUNC_BEFORE = 'before_func',
-        P_FUNC_AFTER = 'after_func',
-        P_GET_PARAMS = 'method_params',
-        P_OPTIONS = 'options',
-        P_FILES = 'files',
-        P_OPTIONS_POSTFIELDS = CURLOPT_POSTFIELDS;
+        URL = 'url',
+        HEADER = 'loading_headers',
+        CONNECTION = 'detail_connection',
+        METHOD = 'method_type',
+        DEPENDENCY = 'dependency',
+        FUNC_BEFORE = 'before_func',
+        FUNC_AFTER = 'after_func',
+        GET_PARAMS = 'method_params',
+        OPTIONS = 'options',
+        FILES = 'files',
+        OPTIONS_POSTFIELDS = CURLOPT_POSTFIELDS;
 
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1487731351">
-  <project timestamp="1487731351">
+<coverage generated="1487732434">
+  <project timestamp="1487732434">
     <package name="Soliton">
       <file name="/home/plekhanov/Projects/vvp/soliton/src/Soliton/Helper.php">
         <class name="Helper" namespace="Soliton" fullPackage="Soliton" package="Soliton">

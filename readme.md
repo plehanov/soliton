@@ -44,42 +44,47 @@ phpunit
     
     $queries = [
         'response_0' => [
-            'url' => 'http://sample_server/section',
-            'methodType' => 'POST',
-            'methodParams' => ['param1' => 400000],
-            'options' => [
+            H::URL => 'http://sample_server/section',
+            H::METHOD => 'POST',
+            H::GET_PARAMS => ['param1' => 400000],
+            H::OPTIONS => [
+                H::OPTIONS_POSTFIELDS => [
+                    'param2' => 1
+                ],
+            ],
+            H::FUNC_BEFORE => null,
+        ],
+        'response_2' => [
+            H::URL => 'http://sample_server/test.php?param1=2', 
+            H::GET_PARAMS => ['param2' => 480000]
+        ],
+        'response_1' => [
+            H::URL => 'http://sample_server/section',
+            H::METHOD => 'POST',
+            H::GET_PARAMS => ['param1' => 200000],
+            H::DEPENDENCY => ['response_0', 'response_2'],
+            H::FUNC_BEFORE => $func_before,
+            H::FUNC_AFTER => $func_after,
+            H::OPTIONS => [
                 CURLOPT_POSTFIELDS => [
                     'param2' => 1
                 ],
             ],
-            'beforeFunc' => null,
-        ],
-        'response_2' => [
-            'url' => 'http://sample_server/test.php?param1=2', 
-            'methodParams' => ['param2' => 480000]
-        ],
-        'response_1' => [
-            'url' => 'http://sample_server/section',
-            'methodType' => 'POST',
-            'methodParams' => ['param1' => 200000],
-            'dependency' => ['response_0', 'response_2'],
-            'beforeFunc' => $func_before,
-            'afterFunc' => $func_after,
         ],
         'response_3' => [
-            'url' => 'http://sample_server/test.php', 
-            'dependency' => ['response_1'], 
-            'methodParams' => ['param1' => 50000]
+            H::URL => 'http://sample_server/test.php', 
+            H::DEPENDENCY => ['response_1'], 
+            H::GET_PARAMS => ['param1' => 50000]
         ],
         'response_4' => [
-            'url' => 'http://test.server.dev/server.php', 
-            'dependency' => ['response_3'], 
-            'methodParams' => ['param1' => 100000]
+            H::URL => 'http://test.server.dev', 
+            H::DEPENDENCY => ['response_3'], 
+            H::GET_PARAMS => ['param1' => 100000]
         ],
         'response_5' => [
-            'url' => 'http://test.server.dev/server.php', 
-            'dependency' => ['response_4'], 
-            'methodParams' => ['param1' => 200000]
+            H::URL => 'http://test.server.dev', 
+            H::DEPENDENCY => ['response_4'], 
+            H::GET_PARAMS => ['param1' => 200000]
         ]
     ];
 ```
@@ -97,11 +102,11 @@ phpunit
             if ($data->owner->account->id) {
                 $url = str_replace('{id}', $data->owner->account->id, $query->getUrl());
                 $query->setUrl($url);
-                $methodParams = [
+                $method_params = [
                     'checksum' => $data->checksum,
                     'auth_token' => $data->auth_token,
                 ];
-                $query->addMethodParams($methodParams);
+                $query->addMethodParams($method_params);
             } else {
                 $query->setExecutable(false);
             }
@@ -119,46 +124,46 @@ phpunit
     
     $query = [
         'login' => [
-            'url' => 'https://server_test/api-signin?expand=owner,owner.account',
-            'detailConnection' => false,
-            'methodParams' => [
+            H::URL => 'https://server_test/api-signin?expand=owner,owner.account',
+            H::CONNECTION => false,
+            H::GET_PARAMS => [
                 'email' => 'sample@gmail.com',
                 'password' => 123,
                 'checksum' => 1234567,
                 'expand' => 'owner,account',
             ],
-            'options' => [
+            H::OPTIONS => [
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => 0,
             ],
-            'afterFunc' => [$afterFunc],
+            H::FUNC_AFTER => [$after_func],
         ],
         'account' => [
-            'url' => 'https://server_test/v1/accounts/{id}',
-            'detailConnection' => true,
-            'dependency' => ['login'],
-            'methodParams' => [
+            H::URL => 'https://server_test/v1/accounts/{id}',
+            H::CONNECTION => true,
+            H::DEPENDENCY => ['login'],
+            H::GET_PARAMS => [
                 'expand' => 'owners,companies',
                 'company.is_active' => true,
             ],
-            'options' => [
+            H::OPTIONS => [
                 CURLOPT_SSL_VERIFYPEER => false,
                 CURLOPT_SSL_VERIFYHOST => 0,
             ],
-            'beforeFunc' => [$before_account],
-            'afterFunc' => [$after_func],
+            H::FUNC_BEFORE => [$before_account],
+            H::FUNC_AFTER => [$after_func],
         ],
     
     ];
     
     $handler = new \Soliton\Soliton($query);
     $data = $handler
-        /* ->setResponses(['login' => $logResponse]) */
         ->timeout(1000)
         ->get(['account']);
     
     /** @var \Soliton\Response $acc */
     $result = $data['account'];
+    
     var_dump($result->getDetailConnection());
 ```
 
@@ -169,18 +174,18 @@ phpunit
     
     $query = [
         'test1' => [
-            H::P_URL => 'http://server/server.php?',
-            H::P_METHOD => 'POST',
-            H::P_CONNECTION => true,
-            H::P_HEADER => true,
-            H::P_GET_PARAMS => ['param1' => 500000, 'param2' => 'files']
+            H::URL => 'http://server/?',
+            H::METHOD => 'POST',
+            H::CONNECTION => true,
+            H::HEADER => true,
+            H::GET_PARAMS => ['param1' => 500000, 'param2' => 'files']
         ],
         'test2' => [
-            H::P_URL => 'http://server/server.php?',
-            H::P_METHOD => 'POST',
-            H::P_CONNECTION => true,
-            H::P_HEADER => true,
-            H::P_GET_PARAMS => ['param1' => 500000, 'param2' => 'files']
+            H::URL => 'http://server/?',
+            H::METHOD => 'POST',
+            H::CONNECTION => true,
+            H::HEADER => true,
+            H::GET_PARAMS => ['param1' => 500000, 'param2' => 'files']
         ],
     ];
     
@@ -190,9 +195,16 @@ phpunit
     $logResponse->setData(json_decode('{"checksum":"1234567","isActive":true,"expiresOn":"2016-01-16T02:21:51Z","owner":{"id":6,"href":"https://javabox.dev:9000/v1/owners/6","isHidden":false,"name":"Takamura","email":"sample@gmail.com","phone":"","account":{"id":1,"href":"https://javabox.dev:9000/v1/accounts/1","isHidden":false,"name":"Авто","owners":[{"href":"https://javabox.dev:9000/v1/owners/3"},{"href":"https://javabox.dev:9000/v1/owners/5"},{"href":"https://javabox.dev:9000/v1/owners/6"},{"href":"https://javabox.dev:9000/v1/owners/2"}],"companies":[{"href":"https://javabox.dev:9000/v1/companies/3"},{"href":"https://javabox.dev:9000/v1/companies/2"},{"href":"https://javabox.dev:9000/v1/companies/1"}],"clients":[]},"role":"PARTNER"},"auth_token":"4c9e-4062-98fc-ee1d97c52c13"}'));
     
     $responses = ['test3' => $logResponse];
-    $data = $handler->setResponses($responses)->timeout(1000)->get(['account']);
+    
+    $data = $handler
+        ->setResponses($responses)
+        ->timeout(1000)
+        ->get(['account']);
     // or
-    $data = $handler->setResponses($responses)->timeout(10000)->get([], false);
+    $data = $handler
+        ->setResponses($responses)
+        ->timeout(10000)
+        ->get([], false);
     
     var_dump($data['test1'], $data['test1a']);
 ```
