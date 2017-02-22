@@ -14,17 +14,17 @@ class Response
     /**
      * @var string
      */
-    private $error_message;
+    private $errorMessage;
 
     /**
      * @var array
      */
-    private $detail_connection = [];
+    private $detailConnection = [];
 
     /**
      * @var $int
      */
-    private $http_code = 200;
+    private $httpCode = 200;
 
     /**
      * @var string
@@ -52,15 +52,15 @@ class Response
      */
     public function getHttpCode()
     {
-        return $this->http_code;
+        return $this->httpCode;
     }
 
     /**
      * @param int
      */
-    public function setHttpCode($http_code)
+    public function setHttpCode($httpCode)
     {
-        $this->http_code = $http_code;
+        $this->httpCode = $httpCode;
     }
 
     /**
@@ -68,15 +68,15 @@ class Response
      */
     public function getDetailConnection()
     {
-        return $this->detail_connection;
+        return $this->detailConnection;
     }
 
     /**
-     * @param array $detail_connection
+     * @param array $detailConnection
      */
-    public function setDetailConnection($detail_connection)
+    public function setDetailConnection($detailConnection)
     {
-        $this->detail_connection = $detail_connection;
+        $this->detailConnection = $detailConnection;
     }
 
     /**
@@ -84,8 +84,8 @@ class Response
      */
     public function isCorrect()
     {
-        return (int)$this->http_code >= 200 && (int)$this->http_code < 300 &&
-            ($this->error_message === null || $this->error_message === '');
+        return (int)$this->httpCode >= 200 && (int)$this->httpCode < 300 &&
+            ($this->errorMessage === null || $this->errorMessage === '');
     }
 
     /**
@@ -109,25 +109,25 @@ class Response
      */
     public function getErrorMessage()
     {
-        return $this->error_message;
+        return $this->errorMessage;
     }
 
     /**
-     * @param string $error_message
+     * @param string $errorMessage
      */
-    public function setErrorMessage($error_message)
+    public function setErrorMessage($errorMessage)
     {
-        $this->error_message = $error_message;
+        $this->errorMessage = $errorMessage;
     }
 
     /**
      * @param string $data
-     * @param int    $header_size
+     * @param int    $headerSize
      */
-    public function setHeaderAndData($data, $header_size = 0)
+    public function setHeaderAndData($data, $headerSize = 0)
     {
-        $header = substr($data, 0, $header_size);
-        $body = substr($data, $header_size);
+        $header = substr($data, 0, $headerSize);
+        $body = substr($data, $headerSize);
 
         $this->header = $header;
         $this->data = (string) $body;

@@ -3,7 +3,6 @@
 [![Latest Stable Version](https://poser.pugx.org/plehanov/soliton/v/stable)](https://packagist.org/packages/plehanov/soliton)
 [![Total Downloads](https://poser.pugx.org/plehanov/soliton/downloads)](https://packagist.org/packages/plehanov/soliton) [![License](https://poser.pugx.org/plehanov/soliton/license)](https://packagist.org/packages/plehanov/soliton)
 [![Code Climate](https://codeclimate.com/github/plehanov/soliton/badges/gpa.svg)](https://codeclimate.com/github/plehanov/soliton)
-[![Test Coverage](https://codeclimate.com/github/plehanov/soliton/badges/coverage.svg)](https://codeclimate.com/github/plehanov/soliton/coverage)
 [![Issue Count](https://codeclimate.com/github/plehanov/soliton/badges/issue_count.svg)](https://codeclimate.com/github/plehanov/soliton)
 
 

@@ -19,7 +19,7 @@ class Query
     /**
      * @var string - lowercase always
      */
-    private $method_type = 'get';
+    private $methodType = 'get';
 
     /**
      * @var array
@@ -34,17 +34,17 @@ class Query
     /**
      * @var array
      */
-    private $before_func = [];
+    private $beforeFunc = [];
 
     /**
      * @var array
      */
-    private $after_func = [];
+    private $afterFunc = [];
 
     /**
      * @var array
      */
-    private $method_params = [];
+    private $methodParams = [];
 
     /**
      * @var array
@@ -54,12 +54,12 @@ class Query
     /**
      * @var bool
      */
-    private $detail_connection = false;
+    private $detailConnection = false;
 
     /**
      * @var bool
      */
-    private $loading_headers = false;
+    private $loadingHeaders = false;
 
     /**
      * @var array
@@ -78,18 +78,18 @@ class Query
             }
         }
         $this->alias = $alias;
-        $this->method_type = strtolower($this->method_type);
+        $this->methodType = strtolower($this->methodType);
         // Если один обработчик то обрачиваем его в массив
-        if (is_callable($this->before_func)) {
-            $this->before_func = [$this->before_func];
-        } elseif (count((array)$this->before_func) === 0) {
-            $this->before_func = [];
+        if (is_callable($this->beforeFunc)) {
+            $this->beforeFunc = [$this->beforeFunc];
+        } elseif (count((array)$this->beforeFunc) === 0) {
+            $this->beforeFunc = [];
         }
         // Если один обработчик то обрачиваем его в массив
-        if (is_callable($this->after_func)) {
-            $this->after_func = [$this->after_func];
-        } elseif (count((array)$this->after_func) === 0) {
-            $this->after_func = [];
+        if (is_callable($this->afterFunc)) {
+            $this->afterFunc = [$this->afterFunc];
+        } elseif (count((array)$this->afterFunc) === 0) {
+            $this->afterFunc = [];
         }
     }
 
@@ -98,15 +98,15 @@ class Query
      */
     public function isLoadingHeaders()
     {
-        return $this->loading_headers;
+        return $this->loadingHeaders;
     }
 
     /**
-     * @param boolean $loading_headers
+     * @param boolean $loadingHeaders
      */
-    public function setLoadingHeaders($loading_headers)
+    public function setLoadingHeaders($loadingHeaders)
     {
-        $this->loading_headers = $loading_headers;
+        $this->loadingHeaders = $loadingHeaders;
     }
 
     /**
@@ -114,15 +114,15 @@ class Query
      */
     public function isDetailConnection()
     {
-        return $this->detail_connection;
+        return $this->detailConnection;
     }
 
     /**
-     * @param boolean $detail_connection
+     * @param boolean $detailConnection
      */
-    public function setDetailConnection($detail_connection)
+    public function setDetailConnection($detailConnection)
     {
-        $this->detail_connection = $detail_connection;
+        $this->detailConnection = $detailConnection;
     }
 
     /**
@@ -130,16 +130,16 @@ class Query
      */
     public function getMethodType()
     {
-        return $this->method_type;
+        return $this->methodType;
     }
 
     /**
-     * @param array $remove_aliases
+     * @param array $removeAliases
      * @return array
      */
-    public function getDependency(array $remove_aliases = [])
+    public function getDependency(array $removeAliases = [])
     {
-        return array_diff($this->dependency, $remove_aliases);
+        return array_diff($this->dependency, $removeAliases);
     }
 
     /**
@@ -163,7 +163,7 @@ class Query
      */
     public function getBeforeFunc()
     {
-        return $this->before_func;
+        return $this->beforeFunc;
     }
 
     /**
@@ -172,7 +172,7 @@ class Query
      */
     public function runBeforeFunc(array $responses, $alias)
     {
-        foreach ($this->before_func as $before) {
+        foreach ($this->beforeFunc as $before) {
             // Выполнить запрос.
             if (is_callable($before)) {
                 $before($this, $responses, $alias);
@@ -185,7 +185,7 @@ class Query
      */
     public function getAfterFunc()
     {
-        return $this->after_func;
+        return $this->afterFunc;
     }
 
     /**
@@ -193,7 +193,7 @@ class Query
      */
     public function runAfterFunc(Response $response)
     {
-        foreach ($this->after_func as $after) {
+        foreach ($this->afterFunc as $after) {
             // Выполнить запрос.
             if (is_callable($after)) {
                 $after($response);
@@ -208,11 +208,11 @@ class Query
     {
         // если урле есть ? то отпилить в конце & и добавить все methodParams
         // в ином случае в конце добавить ? и methodParams
-        if (count($this->method_params) === 0) {
+        if (count($this->methodParams) === 0) {
             $url = $this->url;
         } else {
             $index = strpos($this->url, '?');
-            $paramsString = http_build_query($this->method_params, '', '&');
+            $paramsString = http_build_query($this->methodParams, '', '&');
 
             if ($index === false) {
                 $url = "{$this->url}?{$paramsString}";
@@ -245,15 +245,15 @@ class Query
      */
     public function getMethodParams()
     {
-        return $this->method_params;
+        return $this->methodParams;
     }
 
     /**
-     * @param array $method_params
+     * @param array $methodParams
      */
-    public function setMethodParams($method_params)
+    public function setMethodParams($methodParams)
     {
-        $this->method_params = (array)$method_params;
+        $this->methodParams = (array)$methodParams;
     }
 
     /**
@@ -261,7 +261,7 @@ class Query
      */
     public function addMethodParams($methodParams)
     {
-        $this->method_params = array_merge($this->method_params, (array)$methodParams);
+        $this->methodParams = array_merge($this->methodParams, (array)$methodParams);
     }
 
     /**

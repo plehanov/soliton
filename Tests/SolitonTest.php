@@ -5,6 +5,8 @@
  * Copyright: (c) 2014, Valentin Plehanov
  */
 
+use \Soliton\Helper as H;
+
 class SolitonTest extends PHPUnit_Framework_TestCase
 {
 
@@ -21,10 +23,10 @@ class SolitonTest extends PHPUnit_Framework_TestCase
 
         $queries = [
             'data0' => [
-                'url' => $this->server_url,
-                'method_type' => 'POST',
-                'method_params' => ['sleep' => 400000],
-                'options' => [
+                H::URL => $this->server_url,
+                H::METHOD => 'POST',
+                H::GET_PARAMS => ['sleep' => 400000],
+                H::OPTIONS => [
                     CURLOPT_POSTFIELDS => [
                         'value' => 1
                     ],
@@ -32,31 +34,31 @@ class SolitonTest extends PHPUnit_Framework_TestCase
                 'before_func' => null,
             ],
             'data2' => [
-                'url' => $this->server_url . '?thread1=2',
+                H::URL => $this->server_url . '?thread1=2',
                 'method_params' => ['sleep' => 480000]
             ],
             'data1' => [
-                'url' => $this->server_url,
-                'method_type' => 'POST',
-                'method_params' => ['sleep' => 200000],
-                'dependency' => ['data0', 'data2'],
-                'before_func' => $func,
-                'after_func' => $funcA,
+                H::URL => $this->server_url,
+                H::METHOD => 'POST',
+                H::GET_PARAMS => ['sleep' => 200000],
+                H::DEPENDENCY => ['data0', 'data2'],
+                H::FUNC_BEFORE => $func,
+                H::FUNC_AFTER => $funcA,
             ],
             /*'data3' => [
-                'url' => $this->server_url,
-                'dependency' => ['data1'],
-                'method_params' => ['sleep' => 50000]
+                H::URL => $this->server_url,
+                H::DEPENDENCY => ['data1'],
+                H::GET_PARAMS => ['sleep' => 50000]
             ],
             'data4' => [
-                'url' => $this->server_url,
-                'dependency' => ['data3'],
-                'method_params' => ['sleep' => 100000]
+                H::URL => $this->server_url,
+                H::DEPENDENCY => ['data3'],
+                H::GET_PARAMS => ['sleep' => 100000]
             ],
             'data5' => [
-                'url' => $this->server_url,
-                'dependency' => ['data4'],
-                'method_params' => ['sleep' => 200000]
+                H::URL => $this->server_url,
+                H::DEPENDENCY => ['data4'],
+                H::GET_PARAMS => ['sleep' => 200000]
             ],*/
         ];
 
@@ -72,14 +74,14 @@ class SolitonTest extends PHPUnit_Framework_TestCase
         try {
             $queries = [
                 'data4' => [
-                    'url' => $this->server_url,
-                    'dependency' => ['data5'],
-                    'method_params' => ['sleep' => 100000]
+                    H::URL => $this->server_url,
+                    H::DEPENDENCY => ['data5'],
+                    H::GET_PARAMS => ['sleep' => 100000]
                 ],
                 'data5' => [
-                    'url' => $this->server_url,
-                    'dependency' => ['data4'],
-                    'method_params' => ['sleep' => 200000]
+                    H::URL => $this->server_url,
+                    H::DEPENDENCY => ['data4'],
+                    H::GET_PARAMS => ['sleep' => 200000]
                 ],
             ];
 
@@ -95,9 +97,9 @@ class SolitonTest extends PHPUnit_Framework_TestCase
     {
         $queries = [
             'data4' => [
-                'url' => $this->server_url,
-                'method_params' => ['sleep' => 1000],
-                'detail_connection' => true,
+                H::URL => $this->server_url,
+                H::GET_PARAMS => ['sleep' => 1000],
+                H::CONNECTION => true,
             ]
         ];
 
@@ -109,28 +111,28 @@ class SolitonTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Soliton\Response', $responses['data4'], 'Not correct class');
         /** @var \Soliton\Response $response */
         $response = $responses['data4'];
-        $this->assertEquals((int)$response->getData(), (int)$queries['data4']['method_params']['sleep'], 'Not correct data');
+        $this->assertEquals((int)$response->getData(), (int)$queries['data4'][H::GET_PARAMS]['sleep'], 'Not correct data');
     }
 
     public function testResponse()
     {
         $queries = [
             'data4' => [
-                'url' => $this->server_url,
-                'dependency' => [],
-                'method_params' => ['sleep' => 100000],
-                'detail_connection' => true,
+                H::URL => $this->server_url,
+                H::DEPENDENCY => [],
+                H::GET_PARAMS => ['sleep' => 100000],
+                H::CONNECTION => true,
             ],
             'data5' => [
-                'url' => $this->server_url,
-                'dependency' => ['data4'],
-                'method_params' => ['sleep' => 200000],
+                H::URL => $this->server_url,
+                H::DEPENDENCY => ['data4'],
+                H::GET_PARAMS => ['sleep' => 200000],
             ],
             'data6' => [
-                'url' => $this->server_url,
-                'dependency' => ['data4'],
-                'method_params' => ['sleep' => 200000],
-                'detail_connection' => true,
+                H::URL => $this->server_url,
+                H::DEPENDENCY => ['data4'],
+                H::GET_PARAMS => ['sleep' => 200000],
+                H::CONNECTION => true,
             ],
         ];
 

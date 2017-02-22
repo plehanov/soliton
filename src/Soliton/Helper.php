@@ -17,13 +17,13 @@ class Helper
      */
     const
         URL = 'url',
-        HEADER = 'loading_headers',
-        CONNECTION = 'detail_connection',
-        METHOD = 'method_type',
+        HEADER = 'loadingHeaders',
+        CONNECTION = 'detailConnection',
+        METHOD = 'methodType',
         DEPENDENCY = 'dependency',
-        FUNC_BEFORE = 'before_func',
-        FUNC_AFTER = 'after_func',
-        GET_PARAMS = 'method_params',
+        FUNC_BEFORE = 'beforeFunc',
+        FUNC_AFTER = 'afterFunc',
+        GET_PARAMS = 'methodParams',
         OPTIONS = 'options',
         FILES = 'files',
         OPTIONS_POSTFIELDS = CURLOPT_POSTFIELDS;
