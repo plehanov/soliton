@@ -5,7 +5,7 @@
  * Time: 13:40
  */
 
-namespace Soliton;
+namespace Soliton\Lib;
 
 /**
  * Class Common
