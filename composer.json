@@ -1,6 +1,7 @@
 {
-    "name": " plehanov/soliton",
+    "name": "plehanov/soliton",
     "description": "Multi curl composer application",
+    "keywords": ["curl", "many request", "multi curl"],
     "homepage": "http://github.com/plehanov/soliton",
     "type": "library",
     "license": "MIT",
