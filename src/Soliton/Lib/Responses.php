@@ -36,10 +36,10 @@ class Responses
 
     /**
      * @param array $aliases
-     * @param bool $isOnlyCorrectResponses
+     * @param bool $isOnlyCorrect
      * @return array
      */
-    public function getResponses(array $aliases, $isOnlyCorrectResponses)
+    public function getResponses(array $aliases, $isOnlyCorrect)
     {
         $result = [];
         foreach ($aliases as $alias) {
@@ -48,7 +48,7 @@ class Responses
                 /** @var Response $response */
                 $response = $this->responses[$alias];
 
-                if (!$isOnlyCorrectResponses) {
+                if (!$isOnlyCorrect) {
                     $result[$alias] = $response;
                 } elseif ($response->isCorrect()) {
                     $result[$alias] = $response;

@@ -55,16 +55,16 @@ class Common
      * @param string $inputKey
      * @param array $inputArray
      * @param array $resultArray
+     * @return mixed
      */
     public function convertToStringArray($inputKey, $inputArray, &$resultArray)
     {
         foreach ($inputArray as $key => $value) {
             $tmpKey = (bool)$inputKey ? $inputKey."[$key]" : $key;
             if (is_array($value)) {
-                static::convertToStringArray($tmpKey, $value, $resultArray);
-            } else {
-                $resultArray[$tmpKey] = $value;
+                return static::convertToStringArray($tmpKey, $value, $resultArray);
             }
+            $resultArray[$tmpKey] = $value;
         }
     }
 

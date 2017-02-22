@@ -220,13 +220,7 @@ class Query
         } else {
             $index = strpos($this->url, '?');
             $paramsString = http_build_query($this->methodParams, '', '&');
-
-            if ($index === false) {
-                $url = "{$this->url}?{$paramsString}";
-            } else {
-                $url = rtrim($this->url, '&');
-                $url .= "&{$paramsString}";
-            }
+            $url = $index === false ? "{$this->url}?{$paramsString}" : rtrim($this->url, '&') . "&{$paramsString}";
         }
         return $url;
     }
