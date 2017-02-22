@@ -117,6 +117,7 @@ $handler = new \Soliton\Soliton($query);
 $data = $handler
     //->setResponses(['login' => $logResponse])
     ->timeout(1000)
+    ->onlyCorrect()
     ->get(['account']);
 
 /** @var \Soliton\Response $acc * /
@@ -171,7 +172,7 @@ $query = [
 $handler = new \Soliton\Soliton($query);
 
 //$responses = ['login' => $logResponse];
-//$data = $handler->setResponses($responses)->timeout(1000)->get(['account']);
+//$data = $handler->setResponses($responses)->timeout(1000)->onlyCorrect()->get(['account']);
 
 $responses = [
 //    'test1' => $logResponse,
@@ -181,7 +182,7 @@ $responses = [
 $data = $handler
     ->setResponses($responses)
     ->timeout(10000)
-    ->get([], false);
+    ->get([]);
 
 
 var_dump(
@@ -236,7 +237,7 @@ $handler = new \Soliton\Soliton($queries);
 
 $data = $handler
     ->timeout(100000)
-    ->get([], false);
+    ->get([]);
 
  var_dump($data['data0']->isCorrect());
 

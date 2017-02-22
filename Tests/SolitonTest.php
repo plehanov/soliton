@@ -63,7 +63,7 @@ class SolitonTest extends PHPUnit_Framework_TestCase
         ];
 
         $handler = new \Soliton\Soliton($queries);
-        $result = $handler->timeout(10000)->get([], false);
+        $result = $handler->timeout(10000)->get([]);
 
         $this->assertNotEmpty($result, '1 Soliton result is empty');
         $this->assertCount(count($queries), $result, '2 Soliton result is empty');
@@ -86,7 +86,7 @@ class SolitonTest extends PHPUnit_Framework_TestCase
             ];
 
             $handler = new \Soliton\Soliton($queries);
-            $handler->timeout(100)->get();
+            $handler->timeout(100)->onlyCorrect()->get();
             $this->fail('Trouble with - Mistakes in dependencies (Loop requests etc.)');
         } catch (Exception $e) {
             $this->assertEquals(69, $e->getCode());
@@ -104,7 +104,7 @@ class SolitonTest extends PHPUnit_Framework_TestCase
         ];
 
         $handler = new \Soliton\Soliton($queries);
-        $responses = $handler->get();
+        $responses = $handler->onlyCorrect()->get();
 
         $this->assertEquals(count($responses), 1, 'Not equal Responses.');
         $this->assertNotEmpty($responses['data4'], 'Empty Response');
@@ -139,11 +139,11 @@ class SolitonTest extends PHPUnit_Framework_TestCase
         $response = new \Soliton\Response();
 
         $handler = new \Soliton\Soliton($queries);
-        $data = $handler->setResponses(['data4' => $response])->get(['data5']);
+        $data = $handler->setResponses(['data4' => $response])->onlyCorrect()->get(['data5']);
         $this->assertCount(1, $data);
 
         $handler->clearResponses();
-        $data2 = $handler->get();
+        $data2 = $handler->onlyCorrect()->get();
         $this->assertCount(3, $data2);
     }
 }

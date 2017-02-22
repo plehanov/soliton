@@ -54,6 +54,11 @@ class Soliton
     private $loopPercent = 0.75;
 
     /**
+     * @var bool
+     */
+    private $isOnlyCorrectResponses = false;
+
+    /**
      * @param array $queries
      * @param int $executionTime - default 1500ms = 25s
      * @param float $loopPercent
@@ -87,12 +92,21 @@ class Soliton
     }
 
     /**
+     * Устанавливает триггер который фильтрует результаты работы (выдает только корректные ответы сервера)
+     * @return $this
+     */
+    public function onlyCorrect()
+    {
+        $this->isOnlyCorrectResponses = true;
+        return $this;
+    }
+
+    /**
      * @param array $aliases
-     * @param bool  $isOnlyCorrect - is only correct responses
      * @return mixed
      * @throws \Exception
      */
-    public function get(array $aliases = [], $isOnlyCorrect = true)
+    public function get(array $aliases = [])
     {
         $presentAliases = array_keys($this->responses);
         // Выясняем все кто связан с запрашиваемыми aliases
@@ -104,7 +118,7 @@ class Soliton
         $this->groups = $this->separator($needAliases, $presentAliases);
         $this->run();
         // Возвращаем только затребованные
-        return $this->getResponses($aliases, $isOnlyCorrect);
+        return $this->getResponses($aliases);
     }
 
     /**
@@ -115,7 +129,8 @@ class Soliton
     {
         $totalTime = $this->executionTime;
         $groupsCount = count($this->groups);
-        foreach ($this->groups as $index => $queries) {
+
+        foreach (array_keys($this->groups) as $index) {
             $loopTime = $totalTime * ($groupsCount > 1 ? $this->loopPercent : 1); // Последнего не ограничиваем
             $start = microtime(true);
 
@@ -282,14 +297,14 @@ class Soliton
             $query = $this->queries[$alias];
 
             // Результаты всех зависимостей должны быть корректны.
-            $responses_array = $this->getResponses($query->getDependency());
-            if (count($responses_array) === count($query->getDependency())) {
-                $query->runBeforeFunc($responses_array, $alias);
+            $responsesArray = $this->getResponses($query->getDependency());
+            if (count($responsesArray) === count($query->getDependency())) {
+                $query->runBeforeFunc($responsesArray, $alias);
             } else {
                 // Если запрос не будет выполнен то необходимо добавить Response с ошибкой.
                 $query->setExecutable(false);
 
-                $needResponses = array_diff($aliases, array_keys($responses_array));
+                $needResponses = array_diff($aliases, array_keys($responsesArray));
                 $msg = 'Not all depending on compliance. Incorrect queries: ' . implode(', ', $needResponses);
                 $this->createErrorResponse($alias, $msg);
             }
@@ -338,10 +353,9 @@ class Soliton
 
     /**
      * @param array $aliases
-     * @param bool  $isOnlyCorrect - is only correct responses
      * @return array
      */
-    private function getResponses(array $aliases, $isOnlyCorrect = true)
+    private function getResponses(array $aliases)
     {
         $result = [];
         foreach ($aliases as $alias) {
@@ -349,7 +363,7 @@ class Soliton
             if (array_key_exists($alias, $this->responses)) {
                 /** @var Response $response */
                 $response = $this->responses[$alias];
-                if ($isOnlyCorrect) {
+                if ($this->isOnlyCorrectResponses) {
                     if ($response->isCorrect()) {
                         $result[$alias] = $response;
                     }
@@ -469,37 +483,48 @@ class Soliton
      */
     private function curlMany(array $aliases, $requestTime)
     {
-        $mh = curl_multi_init();
+        $multiHandler = curl_multi_init();
 
         //создаем набор дескрипторов cURL
         $handlers = [];
         foreach ($aliases as $alias) {
             $handlers[$alias] = $this->initRequest($this->queries[$alias], $requestTime);
-            curl_multi_add_handle($mh, $handlers[$alias]);
+            curl_multi_add_handle($multiHandler, $handlers[$alias]);
         }
 
-        // curl_multi_select($mh, $requestTime / 1000); // ms to s
+        // curl_multi_select($multiHandler, $requestTime / 1000); // ms to s
 
         //запускаем дескрипторы
         $runningRequests = null;
         do {
-            $mrc = curl_multi_exec($mh, $runningRequests);
+            $mrc = curl_multi_exec($multiHandler, $runningRequests);
         } while ($mrc == CURLM_CALL_MULTI_PERFORM);
 
         while ($runningRequests && $mrc == CURLM_OK) {
-            if (curl_multi_select($mh, $requestTime / 1000) != -1) {
+            if (curl_multi_select($multiHandler, $requestTime / 1000) != -1) {
                 usleep(100);
             }
             do {
-                $mrc = curl_multi_exec($mh, $runningRequests);
+                $mrc = curl_multi_exec($multiHandler, $runningRequests);
             } while ($mrc == CURLM_CALL_MULTI_PERFORM);
         }
 
 //        do {
-//            curl_multi_exec($mh, $runningRequests);
-//            curl_multi_select($mh);
+//            curl_multi_exec($multiHandler, $runningRequests);
+//            curl_multi_select($multiHandler);
 //        } while ($runningRequests > 0);
 
+        $this->buildMultiResponse($handlers, $multiHandler);
+        curl_multi_close($multiHandler);
+    }
+
+    /**
+     * @author Valentin Plehanov (Takamura)
+     * @param array $handlers
+     * @param resource $multiHandler
+     */
+    private function buildMultiResponse(array $handlers, $multiHandler)
+    {
         foreach ($handlers as $alias => $handler) {
             $response = $this->responses[$alias] = new Response();
             if (curl_errno($handler) !== 0) {
@@ -515,9 +540,8 @@ class Soliton
                 $response->setDetailConnection(curl_getinfo($handler));
             }
             // close current handler
-            curl_multi_remove_handle($mh, $handlers[$alias]);
+            curl_multi_remove_handle($multiHandler, $handlers[$alias]);
         }
-        curl_multi_close($mh);
     }
 }
 

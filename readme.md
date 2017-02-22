@@ -158,6 +158,7 @@ phpunit
     $handler = new \Soliton\Soliton($query);
     $data = $handler
         ->timeout(1000)
+        ->onlyCorrect()
         ->get(['account']);
     
     /** @var \Soliton\Response $acc */
@@ -198,12 +199,13 @@ phpunit
     $data = $handler
         ->setResponses($responses)
         ->timeout(1000)
+        ->onlyCorrect()
         ->get(['account']);
     // or
     $data = $handler
         ->setResponses($responses)
         ->timeout(10000)
-        ->get([], false);
+        ->get([]);
     
     var_dump($data['test1'], $data['test1a']);
 ```

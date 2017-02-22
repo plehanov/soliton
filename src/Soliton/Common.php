@@ -13,8 +13,6 @@ namespace Soliton;
  */
 class Common
 {
-
-
     /**
      * @param array $files
      * @param array $options
@@ -31,7 +29,6 @@ class Common
             }
         }
     }
-
 
     /**
      * @param string $inputKey
