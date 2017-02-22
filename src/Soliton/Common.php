@@ -17,7 +17,7 @@ class Common
      * @param array $files
      * @param array $options
      */
-    public static function prepareFiles(array $files, array &$options)
+    public function prepareFiles(array $files, array &$options)
     {
         if (count($files)) {
             foreach ($files as $key => $dataOfFile) {
@@ -35,7 +35,7 @@ class Common
      * @param array $inputArray
      * @param array $resultArray
      */
-    public static function convertToStringArray($inputKey, $inputArray, &$resultArray)
+    public function convertToStringArray($inputKey, $inputArray, &$resultArray)
     {
         foreach ($inputArray as $key => $value) {
             $tmpKey = (bool)$inputKey ? $inputKey."[$key]" : $key;

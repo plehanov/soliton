@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <testsuites>
-  <testsuite name="Soliton Test Suite" tests="6" assertions="28" failures="0" errors="0" time="8.428238">
-    <testsuite name="QueryTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/QueryTest.php" tests="1" assertions="15" failures="0" errors="0" time="0.001408">
-      <testcase name="testQuery" class="QueryTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/QueryTest.php" line="10" assertions="15" time="0.001408"/>
+  <testsuite name="Soliton Test Suite" tests="6" assertions="28" failures="0" errors="0" time="8.423953">
+    <testsuite name="QueryTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/QueryTest.php" tests="1" assertions="15" failures="0" errors="0" time="0.001376">
+      <testcase name="testQuery" class="QueryTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/QueryTest.php" line="10" assertions="15" time="0.001376"/>
     </testsuite>
-    <testsuite name="ResponseTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/ResponseTest.php" tests="1" assertions="4" failures="0" errors="0" time="0.000648">
-      <testcase name="testResponse" class="ResponseTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/ResponseTest.php" line="11" assertions="4" time="0.000648"/>
+    <testsuite name="ResponseTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/ResponseTest.php" tests="1" assertions="4" failures="0" errors="0" time="0.000629">
+      <testcase name="testResponse" class="ResponseTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/ResponseTest.php" line="11" assertions="4" time="0.000629"/>
     </testsuite>
-    <testsuite name="SolitonTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/SolitonTest.php" tests="4" assertions="9" failures="0" errors="0" time="8.426182">
-      <testcase name="testSoliton" class="SolitonTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/SolitonTest.php" line="15" assertions="2" time="7.712968"/>
-      <testcase name="testExceptionLoop" class="SolitonTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/SolitonTest.php" line="72" assertions="1" time="0.001507"/>
-      <testcase name="testRequest" class="SolitonTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/SolitonTest.php" line="96" assertions="4" time="0.003990"/>
-      <testcase name="testResponse" class="SolitonTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/SolitonTest.php" line="117" assertions="2" time="0.707717"/>
+    <testsuite name="SolitonTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/SolitonTest.php" tests="4" assertions="9" failures="0" errors="0" time="8.421948">
+      <testcase name="testSoliton" class="SolitonTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/SolitonTest.php" line="15" assertions="2" time="7.708849"/>
+      <testcase name="testExceptionLoop" class="SolitonTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/SolitonTest.php" line="72" assertions="1" time="0.001712"/>
+      <testcase name="testRequest" class="SolitonTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/SolitonTest.php" line="96" assertions="4" time="0.003902"/>
+      <testcase name="testResponse" class="SolitonTest" file="/home/plekhanov/Projects/vvp/soliton/Tests/SolitonTest.php" line="117" assertions="2" time="0.707485"/>
     </testsuite>
   </testsuite>
 </testsuites>

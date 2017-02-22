@@ -363,11 +363,10 @@ class Soliton
             if (array_key_exists($alias, $this->responses)) {
                 /** @var Response $response */
                 $response = $this->responses[$alias];
-                if ($this->isOnlyCorrectResponses) {
-                    if ($response->isCorrect()) {
-                        $result[$alias] = $response;
-                    }
-                } else {
+
+                if (!$this->isOnlyCorrectResponses) {
+                    $result[$alias] = $response;
+                } elseif ($response->isCorrect()) {
                     $result[$alias] = $response;
                 }
             }
@@ -430,7 +429,7 @@ class Soliton
             $options[CURLOPT_POSTFIELDS] = [];
         }
         $files = $query->getFiles();
-        Common::prepareFiles($files, $options);
+        (new Common)->prepareFiles($files, $options);
 
         curl_setopt_array($channel, $options);
         return $channel;
@@ -446,7 +445,7 @@ class Soliton
             // пакуем опции если они переданны в виде массива
             if (isset($options[CURLOPT_POSTFIELDS]) && is_array($options[CURLOPT_POSTFIELDS])) {
                 $arr = [];
-                Common::convertToStringArray('', $options[CURLOPT_POSTFIELDS], $arr);
+                (new Common)->convertToStringArray('', $options[CURLOPT_POSTFIELDS], $arr);
                 $options[CURLOPT_POSTFIELDS] = $arr;
             }
         }
