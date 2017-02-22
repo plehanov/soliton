@@ -14,17 +14,17 @@ class Response
     /**
      * @var string
      */
-    private $errorMessage;
+    private $error_message;
 
     /**
      * @var array
      */
-    private $detailConnection = [];
+    private $detail_connection = [];
 
     /**
      * @var $int
      */
-    private $httpCode = 200;
+    private $http_code = 200;
 
     /**
      * @var string
@@ -52,15 +52,15 @@ class Response
      */
     public function getHttpCode()
     {
-        return $this->httpCode;
+        return $this->http_code;
     }
 
     /**
-     * @param mixed int
+     * @param int
      */
-    public function setHttpCode($httpCode)
+    public function setHttpCode($http_code)
     {
-        $this->httpCode = $httpCode;
+        $this->http_code = $http_code;
     }
 
     /**
@@ -68,15 +68,15 @@ class Response
      */
     public function getDetailConnection()
     {
-        return $this->detailConnection;
+        return $this->detail_connection;
     }
 
     /**
-     * @param array $detailConnection
+     * @param array $detail_connection
      */
-    public function setDetailConnection($detailConnection)
+    public function setDetailConnection($detail_connection)
     {
-        $this->detailConnection = $detailConnection;
+        $this->detail_connection = $detail_connection;
     }
 
     /**
@@ -84,8 +84,8 @@ class Response
      */
     public function isCorrect()
     {
-        return (int)$this->httpCode >= 200 && (int)$this->httpCode < 300 &&
-            ($this->errorMessage === null || $this->errorMessage === '');
+        return (int)$this->http_code >= 200 && (int)$this->http_code < 300 &&
+            ($this->error_message === null || $this->error_message === '');
     }
 
     /**
@@ -109,25 +109,25 @@ class Response
      */
     public function getErrorMessage()
     {
-        return $this->errorMessage;
+        return $this->error_message;
     }
 
     /**
-     * @param string $errorMessage
+     * @param string $error_message
      */
-    public function setErrorMessage($errorMessage)
+    public function setErrorMessage($error_message)
     {
-        $this->errorMessage = $errorMessage;
+        $this->error_message = $error_message;
     }
 
     /**
      * @param string $data
-     * @param int    $headerSize
+     * @param int    $header_size
      */
-    public function setHeaderAndData($data, $headerSize = 0)
+    public function setHeaderAndData($data, $header_size = 0)
     {
-        $header = substr($data, 0, $headerSize);
-        $body = substr($data, $headerSize);
+        $header = substr($data, 0, $header_size);
+        $body = substr($data, $header_size);
 
         $this->header = $header;
         $this->data = (string) $body;

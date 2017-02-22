@@ -37,41 +37,41 @@ class Soliton
      * Общее время выполнение
      * @var int
      */
-    private $executionTime;
+    private $execution_time;
 
     /**
      * @var float - 1=100%
      */
-    private $loopPercent = 0.75;
+    private $loop_percent = 0.75;
 
     /**
      * @param array $queries
-     * @param int $executionTime - default 1500ms = 25s
-     * @param float $defaultLoopPercent
+     * @param int $execution_time - default 1500ms = 25s
+     * @param float $loop_percent
      * @throws \Exception
      */
-    public function __construct(array $queries, $executionTime = 1500, $defaultLoopPercent = 0.75)
+    public function __construct(array $queries, $execution_time = 1500, $loop_percent = 0.75)
     {
-        $this->executionTime = (int)$executionTime;
-        $this->loopPercent = (float)$defaultLoopPercent;
+        $this->execution_time = (int)$execution_time;
+        $this->loop_percent = (float)$loop_percent;
 
-        foreach ($queries as $alias => $query) {
-            $this->queries[$alias] = $query instanceof Query ? $query : new Query($alias, $query);
+        foreach ($queries as $alias => $options) {
+            $this->queries[$alias] = $options instanceof Query ? $options : new Query($alias, $options);
         }
     }
 
     /**
-     * @param int $executionTime - millisecond
-     * @param float $loopPercent - 1 = 100%
+     * @param int $execution_time - millisecond
+     * @param float $loop_percent - 1 = 100%
      * @return $this
      * @throws \Exception
      */
-    public function timeout($executionTime = null, $loopPercent = null)
+    public function timeout($execution_time = null, $loop_percent = null)
     {
-        $this->executionTime = $executionTime === null ? $this->executionTime : (int)$executionTime;
-        $this->loopPercent = $loopPercent === null ? $this->loopPercent : (float)$loopPercent;
+        $this->execution_time = $execution_time === null ? $this->execution_time : (int)$execution_time;
+        $this->loop_percent = $loop_percent === null ? $this->loop_percent : (float)$loop_percent;
 
-        if ($this->executionTime === 0 || $this->loopPercent === 0) {
+        if ($this->execution_time === 0 || $this->loop_percent === 0) {
             throw new \Exception('"Total time" or "percent loop" mast not be zero.', 70);
         }
         return $this;
@@ -79,23 +79,23 @@ class Soliton
 
     /**
      * @param array $aliases
-     * @param bool  $onlyCorrectResponses
+     * @param bool  $only_correct_responses
      * @return mixed
      * @throws \Exception
      */
-    public function get(array $aliases = [], $onlyCorrectResponses = true)
+    public function get(array $aliases = [], $only_correct_responses = true)
     {
-        $presentResponsesAliases = array_keys($this->responses);
+        $present_aliases = array_keys($this->responses);
         // Выясняем все кто связан с запрашиваемыми aliases
         if (count($aliases) === 0) {
             $aliases = array_keys($this->queries);
         }
-        $needAliases = $this->getChainDependencies($aliases, $presentResponsesAliases);
+        $need_aliases = $this->getChainDependencies($aliases, $present_aliases);
         // Расслоение по группам запросов к ядру
-        $this->groups = $this->separator($needAliases, $presentResponsesAliases);
+        $this->groups = $this->separator($need_aliases, $present_aliases);
         $this->run();
         // Возвращаем только затребованные
-        return $this->getResponses($aliases, $onlyCorrectResponses);
+        return $this->getResponses($aliases, $only_correct_responses);
     }
 
     /**
@@ -104,29 +104,27 @@ class Soliton
      */
     private function run()
     {
-        $totalTime = $this->executionTime;
-        $groupsCount = count($this->groups);
+        $total_time = $this->execution_time;
+        $groups_count = count($this->groups);
         foreach ($this->groups as $index => $queries) {
-            $loopTime = $totalTime * ($groupsCount > 1 ? $this->loopPercent : 1); // Последнего не ограничиваем
+            $loop_time = $total_time * ($groups_count > 1 ? $this->loop_percent : 1); // Последнего не ограничиваем
             $start = microtime(true);
 
-            $this->executeGroup($index, $loopTime);
-
+            $this->executeGroup($index, $loop_time);
             $stop = microtime(true);
-            $totalTime -= (($stop - $start) * 1000);
+            $total_time -= (($stop - $start) * 1000);
 
-            $groupsCount--;
+            $groups_count--;
         }
-
     }
 
     /**
-     * @param array $needAliases - if empty then return all
-     * @param array $presentResponsesAliases
+     * @param array $need_aliases - if empty then return all
+     * @param array $present_aliases - resent responses aliases
      * @return array
      * @throws \Exception
      */
-    private function separator(array $needAliases = [], array $presentResponsesAliases = [])
+    private function separator(array $need_aliases = [], array $present_aliases = [])
     {
         $groups = [];
         $req = $this->queries;
@@ -135,24 +133,24 @@ class Soliton
         $cnt = 0;
 
         for ($index = 0; $index < $total && $cnt < $total; $index++) {
-            $newGroup = [];
+            $new_group = [];
             /** @var Query $query */
             foreach ($req as $alias => $query) {
                 if (
-                    in_array($alias, $needAliases)
-                    && ! $this->checkDependency($query->getDependency($presentResponsesAliases), $groups)
+                    in_array($alias, $need_aliases)
+                    && ! $this->checkDependency($query->getDependency($present_aliases), $groups)
                 ) {
                     // Этот элемент еще рано добавлять в круг - ничего не делаем. Есть зависимости но не все в кругах
                 } else {
-                    if (in_array($alias, $needAliases)) {
-                        $newGroup[] = $alias;
+                    if (in_array($alias, $need_aliases)) {
+                        $new_group[] = $alias;
                     }
                     $cnt++;
                     unset($req[$alias]);
                 }
             }
-            if (count($newGroup) > 0) {
-                $groups[] = $newGroup;
+            if (count($new_group) > 0) {
+                $groups[] = $new_group;
             }
         }
 
@@ -165,32 +163,32 @@ class Soliton
 
     /**
      * @param array $aliases
-     * @param array $presentResponsesAliases
+     * @param array $present_aliases -  present responses aliases
      * @return array
      */
-    private function getChainDependencies(array $aliases, array $presentResponsesAliases)
+    private function getChainDependencies(array $aliases, array $present_aliases)
     {
         // Выбрать все из списка $needAliases,
         // и отключить зависимости с учетом того что уже какие-то responses есть
         $queries = $this->queries;
-        $func = function (array $aliases) use ($queries, $presentResponsesAliases) {
-            $newDependencies = [];
+        $func = function (array $aliases) use ($queries, $present_aliases) {
+            $new_dependencies = [];
             foreach ($aliases as $alias) {
                 // берем запрос от которого зависим - ищем его зависимости, складируем их
                 if (array_key_exists($alias, $queries)) {
                     /** @var Query $query */
                     $query = $queries[$alias];
-                    $dependencies = $query->getDependency($presentResponsesAliases);
-                    $newDependencies += $dependencies; //http://php.net/manual/ru/language.operators.array.php
+                    $dependencies = $query->getDependency($present_aliases);
+                    $new_dependencies += $dependencies; //http://php.net/manual/ru/language.operators.array.php
                 }
             }
-            return $newDependencies;
+            return $new_dependencies;
         };
 
-        $needAliases_ = $aliases;
-        for ($index = 0; $index < count($queries) && count($needAliases_) > 0; $index++) {
-            $needAliases_ = $func($needAliases_);
-            $aliases = array_merge($aliases, $needAliases_);
+        $need_aliases = $aliases;
+        for ($index = 0; $index < count($queries) && count($need_aliases) > 0; $index++) {
+            $need_aliases = $func($need_aliases);
+            $aliases = array_merge($aliases, $need_aliases);
         }
         return $aliases;
     }
@@ -202,17 +200,17 @@ class Soliton
      */
     private function checkDependency(array $dependencies, array $groups)
     {
-        $presentCounter = 0;
+        $present_counter = 0;
         if (count($dependencies) > 0) {
             foreach ($groups as $group) {
                 foreach ($dependencies as $request) {
                     if (in_array($request, $group)) {
-                        $presentCounter++;
+                        $present_counter++;
                     }
                 }
             }
         }
-        return count($dependencies) === $presentCounter;
+        return count($dependencies) === $present_counter;
     }
 
 //  Execute ------------------------------------------------------------------------------------------------------------
@@ -224,22 +222,22 @@ class Soliton
      */
     private function getExecutableRequests(array $groups)
     {
-        $executableQueries = [];
+        $executable_queries = [];
         foreach ($groups as $alias) {
             /** @var Query $req */
             $req = $this->queries[$alias];
             if ($req->isExecutable()) {
-                $executableQueries[] = $alias;
+                $executable_queries[] = $alias;
             }
         }
-        return $executableQueries;
+        return $executable_queries;
     }
 
     /**
      * @param int $index
-     * @param int $groupTime
+     * @param int $group_time
      */
-    private function executeGroup($index, $groupTime)
+    private function executeGroup($index, $group_time)
     {
         $group = $this->getExecutableRequests($this->groups[$index]);
         // Отрабатываем before callback
@@ -249,16 +247,15 @@ class Soliton
         $cnt = count($group);
 
         if ($cnt !== 0) {
-            if ((int)$groupTime >= 0) { // Блокирую выполнение если нет времени на эту операцию
+            if ((int)$group_time >= 0) { // Блокирую выполнение если нет времени на эту операцию
                 if ($cnt === 1) {
-                    $this->curlOne($group[0], $groupTime);
+                    $this->curlOne($group[0], $group_time);
                 } else {
-                    $this->curlMany($group, $groupTime);
+                    $this->curlMany($group, $group_time);
                 }
             } else { //Если залочил то необходимо создать пустышки. Что-бы after callback отработал
-                $errorMsg = 'Previous loop timed out';
                 foreach ($group as $alias) {
-                    $this->createErrorResponse($alias, $errorMsg);
+                    $this->createErrorResponse($alias, 'Previous loop timed out');
                 }
             }
             // Отрабатываем after callback
@@ -277,18 +274,17 @@ class Soliton
             $query = $this->queries[$alias];
 
             // Результаты всех зависимостей должны быть корректны.
-            $responsesArray = $this->getResponses($query->getDependency());
-            if (count($responsesArray) === count($query->getDependency())) {
-                $query->runBeforeFunc($responsesArray, $alias);
+            $responses_array = $this->getResponses($query->getDependency());
+            if (count($responses_array) === count($query->getDependency())) {
+                $query->runBeforeFunc($responses_array, $alias);
             } else {
                 // Если запрос не будет выполнен то необходимо добавить Response с ошибкой.
                 $query->setExecutable(false);
 
-                $needResponses = array_diff($aliases, array_keys($responsesArray));
-                $errorMsg = 'Not all depending on compliance. Incorrect queries: ' . implode(', ', $needResponses);
-                $this->createErrorResponse($alias, $errorMsg);
+                $need_responses = array_diff($aliases, array_keys($responses_array));
+                $error_msg = 'Not all depending on compliance. Incorrect queries: ' . implode(', ', $need_responses);
+                $this->createErrorResponse($alias, $error_msg);
             }
-
         }
     }
 
@@ -334,10 +330,10 @@ class Soliton
 
     /**
      * @param array $aliases
-     * @param bool  $onlyCorrectResponses
+     * @param bool  $only_correct_responses
      * @return array
      */
-    private function getResponses(array $aliases, $onlyCorrectResponses = true)
+    private function getResponses(array $aliases, $only_correct_responses = true)
     {
         $result = [];
         foreach ($aliases as $alias) {
@@ -345,7 +341,7 @@ class Soliton
             if (array_key_exists($alias, $this->responses)) {
                 /** @var Response $response */
                 $response = $this->responses[$alias];
-                if ($onlyCorrectResponses) {
+                if ($only_correct_responses) {
                     if ($response->isCorrect()) {
                         $result[$alias] = $response;
                     }
@@ -359,32 +355,32 @@ class Soliton
 
     /**
      * @param string $alias
-     * @param string $errorMsg
+     * @param string $message
      */
-    private function createErrorResponse($alias, $errorMsg)
+    private function createErrorResponse($alias, $message)
     {
         $response = $this->responses[$alias] = new Response();
-        $response->setErrorMessage($errorMsg);
+        $response->setErrorMessage($message);
     }
 
 //  CURL ---------------------------------------------------------------------------------------------------------------
 
     /**
      * @param Query $query
-     * @param int $requestTime
+     * @param int $request_time
      * @return resource
      */
-    private function initRequest(Query $query, $requestTime)
+    private function initRequest(Query $query, $request_time)
     {
         // Создание нового ресурса cURL
-        $ch = curl_init();
+        $channel = curl_init();
         // установка URL и других необходимых параметров
         $options = [
             CURLOPT_URL => $query->getFullUrl(),
             CURLOPT_HEADER => 1,  // get the header
             CURLINFO_HEADER_OUT => 1,
             CURLOPT_RETURNTRANSFER => 1,
-            CURLOPT_TIMEOUT_MS => $requestTime, //milliseconds 1s=1000ms $requestTime
+            CURLOPT_TIMEOUT_MS => $request_time, //milliseconds 1s=1000ms $requestTime
             CURLOPT_USERAGENT => "Soliton/{$this->version} (PHP "
                 . phpversion() . '; CURL ' . curl_version()['version'] . ')'
         ];
@@ -404,9 +400,9 @@ class Soliton
                 $options[CURLOPT_HTTPGET] = true; // нужно указывать только в том случае если мы его изменили
         }
 
-        $customOptions = $query->getOptions();
-        $customOptions = static::preparePOSTFields($customOptions);
-        $options = array_replace($options, $customOptions);
+        $custom_options = $query->getOptions();
+        $custom_options = static::preparePOSTFields($custom_options);
+        $options = array_replace($options, $custom_options);
 
         if ($query->getMethodType() === 'post' && empty($options[CURLOPT_POSTFIELDS])) {
             $options[CURLOPT_POSTFIELDS] = [];
@@ -414,8 +410,8 @@ class Soliton
         $files = $query->getFiles();
         static::prepareFiles($files, $options);
 
-        curl_setopt_array($ch, $options);
-        return $ch;
+        curl_setopt_array($channel, $options);
+        return $channel;
     }
 
     /**
@@ -442,11 +438,11 @@ class Soliton
     private static function prepareFiles(array $files, array &$options)
     {
         if (count($files)) {
-            foreach ($files as $key => $dataOfFile) {
-                if (is_array($dataOfFile['name'])) {
-                    $options = static::setRequestFiles($options, $key, $dataOfFile);
+            foreach ($files as $key => $data_of_file) {
+                if (is_array($data_of_file['name'])) {
+                    $options = static::setRequestFiles($options, $key, $data_of_file);
                 } else {
-                    $options = static::setRequestFile($options, $key, $dataOfFile);
+                    $options = static::setRequestFile($options, $key, $data_of_file);
                 }
             }
         }
@@ -491,80 +487,80 @@ class Soliton
 
     /**
      * @param string $inputKey
-     * @param array $inputArray
-     * @param array $resultArray
+     * @param array $input_array
+     * @param array $result_array
      */
-    private static function convertToStringArray($inputKey, $inputArray, &$resultArray)
+    private static function convertToStringArray($inputKey, $input_array, &$result_array)
     {
-        foreach ($inputArray as $key => $value) {
+        foreach ($input_array as $key => $value) {
             $tmpKey = (bool)$inputKey ? $inputKey."[$key]" : $key;
             if (is_array($value)) {
-                static::convertToStringArray($tmpKey, $value, $resultArray);
+                static::convertToStringArray($tmpKey, $value, $result_array);
             } else {
-                $resultArray[$tmpKey] = $value;
+                $result_array[$tmpKey] = $value;
             }
         }
     }
 
     /**
      * @param string $alias
-     * @param int $requestTime
+     * @param int $request_time
      */
-    private function curlOne($alias, $requestTime)
+    private function curlOne($alias, $request_time)
     {
         /** @var Query $query */
         $query = $this->queries[$alias];
-        $ch = $this->initRequest($query, $requestTime);
+        $channel = $this->initRequest($query, $request_time);
         $response = $this->responses[$alias] = new Response();
-        $data = curl_exec($ch);
-        $headerSize = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-        $response->setHeaderAndData($data, $headerSize);
-        if (curl_errno($ch) !== 0) {
-            $response->setErrorMessage(curl_error($ch));
+        $data = curl_exec($channel);
+        $header_size = curl_getinfo($channel, CURLINFO_HEADER_SIZE);
+        $response->setHeaderAndData($data, $header_size);
+        if (curl_errno($channel) !== 0) {
+            $response->setErrorMessage(curl_error($channel));
         }
-        $response->setHttpCode(curl_getinfo($ch, CURLINFO_HTTP_CODE));
+        $response->setHttpCode(curl_getinfo($channel, CURLINFO_HTTP_CODE));
         if ($query->isDetailConnection()) {
-            $response->setDetailConnection(curl_getinfo($ch));
+            $response->setDetailConnection(curl_getinfo($channel));
         }
-        curl_close($ch);
+        curl_close($channel);
     }
 
     /**
      * @param array $aliases
-     * @param int $requestTime
+     * @param int $request_time
      */
-    private function curlMany(array $aliases, $requestTime)
+    private function curlMany(array $aliases, $request_time)
     {
         $mh = curl_multi_init();
 
         //создаем набор дескрипторов cURL
         $handlers = [];
         foreach ($aliases as $alias) {
-            $handlers[$alias] = $this->initRequest($this->queries[$alias], $requestTime);
+            $handlers[$alias] = $this->initRequest($this->queries[$alias], $request_time);
             curl_multi_add_handle($mh, $handlers[$alias]);
         }
 
         // curl_multi_select($mh, $requestTime / 1000); // ms to s
 
         //запускаем дескрипторы
-        $runningRequests = null;
+        $running_requests = null;
         do {
-            $mrc = curl_multi_exec($mh, $runningRequests);
+            $mrc = curl_multi_exec($mh, $running_requests);
         } while ($mrc == CURLM_CALL_MULTI_PERFORM);
 
-        while ($runningRequests && $mrc == CURLM_OK) {
-            if (curl_multi_select($mh, $requestTime / 1000) != -1) {
+        while ($running_requests && $mrc == CURLM_OK) {
+            if (curl_multi_select($mh, $request_time / 1000) != -1) {
                 usleep(100);
             }
             do {
-                $mrc = curl_multi_exec($mh, $runningRequests);
+                $mrc = curl_multi_exec($mh, $running_requests);
             } while ($mrc == CURLM_CALL_MULTI_PERFORM);
         }
 
 //        do {
-//            curl_multi_exec($mh, $runningRequests);
+//            curl_multi_exec($mh, $running_requests);
 //            curl_multi_select($mh);
-//        } while ($runningRequests > 0);
+//        } while ($running_requests > 0);
 
         foreach ($handlers as $alias => $handler) {
             $response = $this->responses[$alias] = new Response();
@@ -573,8 +569,8 @@ class Soliton
             }
             $response->setHttpCode(curl_getinfo($handler, CURLINFO_HTTP_CODE));
             $data = curl_multi_getcontent($handler);
-            $headerSize = curl_getinfo($handler, CURLINFO_HEADER_SIZE);
-            $response->setHeaderAndData($data, $headerSize);
+            $header_size = curl_getinfo($handler, CURLINFO_HEADER_SIZE);
+            $response->setHeaderAndData($data, $header_size);
             /** @var Query $query */
             $query = $this->queries[$alias];
             if ($query->isDetailConnection()) {
@@ -583,7 +579,7 @@ class Soliton
             // close current handler
             curl_multi_remove_handle($mh, $handlers[$alias]);
         }
-
         curl_multi_close($mh);
     }
 }
+
