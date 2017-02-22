@@ -8,7 +8,9 @@
 
 namespace Soliton;
 
+use Soliton\Lib\Common;
 use Soliton\Lib\Executor;
+use Soliton\Lib\Responses;
 
 /**
  * Class Soliton
@@ -111,7 +113,7 @@ class Soliton
         $this->groups = $this->separator($needAliases, $presentAliases);
         $this->run();
         // Возвращаем только затребованные
-        return $this->getResponses($aliases);
+        return (new Responses($this->responses))->getResponses($aliases, $this->isOnlyCorrectResponses);
     }
 
     /**
@@ -149,13 +151,14 @@ class Soliton
         $total = count($this->queries);
         $cnt = 0;
 
+        $common = new Common();
         for ($index = 0; $index < $total && $cnt < $total; $index++) {
             $newGroup = [];
             /** @var Query $query */
             foreach ($this->queries as $alias => $query) {
                 if (
                     in_array($alias, $needAliases)
-                    && ! $this->presentNeededDependency($query->getDependency($presentAliases), $groups)
+                    && ! $common->presentNeededDependency($query->getDependency($presentAliases), $groups)
                 ) {
                     // Этот элемент еще рано добавлять в круг - ничего не делаем. Есть зависимости но не все в кругах
                 } else {
@@ -209,27 +212,6 @@ class Soliton
         return $aliases;
     }
 
-    /**
-     * Удостоверяет что все требуемые зависимости присутсвуют в группах
-     * @param array $dependencies проверяемые зависимости
-     * @param array $groups круги в которых проверяем наличие запросов от которых зависим
-     * @return bool
-     */
-    private function presentNeededDependency(array $dependencies, array $groups)
-    {
-        $presentCounter = 0;
-        if (count($dependencies) > 0) {
-            foreach ($groups as $group) {
-                foreach ($dependencies as $request) {
-                    if (in_array($request, $group)) {
-                        $presentCounter++;
-                    }
-                }
-            }
-        }
-        return count($dependencies) === $presentCounter;
-    }
-
 //  Execute ------------------------------------------------------------------------------------------------------------
 
     /**
@@ -263,16 +245,15 @@ class Soliton
         $group = $this->getExecutableRequests($this->groups[$index]);
         $cnt = count($group);
 
-        $executor = new Executor();
         if ($cnt !== 0) {
             // Блокирую выполнение если нет времени на эту операцию
             if ((int)$groupTime <= 0) {
                 // Если залочил то необходимо создать пустышки. Что-бы after callback отработал
-                $this->createErrorResponse($group, 'Previous loop timed out');
+                (new Responses($this->responses))->createErrorResponse($group, 'Previous loop timed out');
             } elseif ($cnt === 1) {
-                $executor->curlOne($group[0], $groupTime, $this->queries, $this->responses);
+                (new Executor)->curlOne($group[0], $groupTime, $this->queries, $this->responses);
             } elseif ($cnt > 1) {
-                $executor->curlMany($group, $groupTime, $this->queries, $this->responses);
+                (new Executor)->curlMany($group, $groupTime, $this->queries, $this->responses);
             }
             // Отрабатываем after callback
             $this->executeQueriesAfter($group);
@@ -284,13 +265,14 @@ class Soliton
      */
     private function executeQueriesBefore(array $aliases)
     {
+        $respHelper = new Responses($this->responses);
         // переданные сюда названия, 100% существующие запросы
         foreach ($aliases as $alias) {
             /** @var Query $query */
             $query = $this->queries[$alias];
 
             // Результаты всех зависимостей должны быть корректны.
-            $responsesArray = $this->getResponses($query->getDependency());
+            $responsesArray = $respHelper->getResponses($query->getDependency(), $this->isOnlyCorrectResponses);
 
             if (count($responsesArray) === count($query->getDependency())) {
                 $query->runBeforeFunc($responsesArray, $alias);
@@ -298,7 +280,7 @@ class Soliton
                 // Если запрос не будет выполнен то необходимо добавить Response с ошибкой.
                 $query->setExecutable(false);
                 $needResponses = array_diff($aliases, array_keys($responsesArray));
-                $this->createErrorResponse($alias, 'Not all depending on compliance. Incorrect queries: ' . implode(', ', $needResponses));
+                $respHelper->createErrorResponse($alias, 'Not all depending on compliance. Incorrect queries: ' . implode(', ', $needResponses));
             }
         }
     }
@@ -342,44 +324,4 @@ class Soliton
         $this->responses = [];
         return $this;
     }
-
-    /**
-     * @param array $aliases
-     * @return array
-     */
-    private function getResponses(array $aliases)
-    {
-        $result = [];
-        foreach ($aliases as $alias) {
-            // ответ есть и запрос корректен(нет ошибок)
-            if (array_key_exists($alias, $this->responses)) {
-                /** @var Response $response */
-                $response = $this->responses[$alias];
-
-                if (!$this->isOnlyCorrectResponses) {
-                    $result[$alias] = $response;
-                } elseif ($response->isCorrect()) {
-                    $result[$alias] = $response;
-                }
-            }
-        }
-        return $result;
-    }
-
-    /**
-     * @param string|array $alias
-     * @param string $message
-     */
-    private function createErrorResponse($alias, $message)
-    {
-        if (is_array($alias)) {
-            foreach ($alias as $item) {
-                $this->createErrorResponse($item, $message);
-            }
-        }
-        $response = $this->responses[$alias] = new Response();
-        $response->setErrorMessage($message);
-    }
-
 }
-

@@ -13,6 +13,27 @@ namespace Soliton\Lib;
  */
 class Common
 {
+     /**
+     * Удостоверяет что все требуемые зависимости присутсвуют в группах
+     * @param array $dependencies проверяемые зависимости
+     * @param array $groups круги в которых проверяем наличие запросов от которых зависим
+     * @return bool
+     */
+    public function presentNeededDependency(array $dependencies, array $groups)
+    {
+        $presentCounter = 0;
+        if (count($dependencies) > 0) {
+            foreach ($groups as $group) {
+                foreach ($dependencies as $request) {
+                    if (in_array($request, $group)) {
+                        $presentCounter++;
+                    }
+                }
+            }
+        }
+        return count($dependencies) === $presentCounter;
+    }
+
     /**
      * @param array $files
      * @param array $options
