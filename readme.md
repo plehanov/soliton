@@ -1,5 +1,10 @@
 #Multi Curl
 
+[![Latest Stable Version](https://poser.pugx.org/plehanov/soliton/v/stable)](https://packagist.org/packages/plehanov/soliton)
+[![Test Coverage](https://codeclimate.com/github/plehanov/soliton/badges/coverage.svg)](https://codeclimate.com/github/plehanov/soliton/coverage)
+[![Total Downloads](https://poser.pugx.org/plehanov/soliton/downloads)](https://packagist.org/packages/plehanov/soliton) [![License](https://poser.pugx.org/plehanov/soliton/license)](https://packagist.org/packages/plehanov/soliton)
+
+
 Allows parallel queries. Queries can be constructed in the form of a chain, with dependencies on the results of the previous ones.
 Soliton itself divides into groups and processes requests.
 It is possible to set the overall timeout on the whole process. He balances the distribution of time.
