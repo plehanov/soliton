@@ -10,7 +10,19 @@
         convertWarningsToExceptions="true"
         convertNoticesToExceptions="true"
         bootstrap="test.php"
+        codecoverage="true"
+        haltonfailure="true"
+        haltonerror="true"
         >
+
+    <filter>
+        <whitelist processUncoveredFilesFromWhitelist="true">
+            <directory suffix=".php">./src/Soliton/</directory>
+        </whitelist>
+        <blacklist>
+            <directory suffix=".php">./help</directory>
+        </blacklist>
+    </filter>
 
     <testsuites>
         <testsuite name="Soliton Test Suite">
