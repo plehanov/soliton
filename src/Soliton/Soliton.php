@@ -263,15 +263,16 @@ class Soliton
         $group = $this->getExecutableRequests($this->groups[$index]);
         $cnt = count($group);
 
+        $executor = new Executor();
         if ($cnt !== 0) {
             // Блокирую выполнение если нет времени на эту операцию
             if ((int)$groupTime <= 0) {
                 // Если залочил то необходимо создать пустышки. Что-бы after callback отработал
                 $this->createErrorResponse($group, 'Previous loop timed out');
             } elseif ($cnt === 1) {
-                $this->curlOne($group[0], $groupTime);
+                $executor->curlOne($group[0], $groupTime, $this->queries, $this->responses);
             } elseif ($cnt > 1) {
-                $this->curlMany($group, $groupTime);
+                $executor->curlMany($group, $groupTime, $this->queries, $this->responses);
             }
             // Отрабатываем after callback
             $this->executeQueriesAfter($group);
@@ -380,97 +381,5 @@ class Soliton
         $response->setErrorMessage($message);
     }
 
-//  CURL ---------------------------------------------------------------------------------------------------------------
-
-    /**
-     * @param string $alias
-     * @param int $requestTime
-     */
-    private function curlOne($alias, $requestTime)
-    {
-        /** @var Query $query */
-        $query = $this->queries[$alias];
-        $channel = (new Executor)->initRequest($query, $requestTime);
-        $response = $this->responses[$alias] = new Response();
-        $data = curl_exec($channel);
-        $headerSize = curl_getinfo($channel, CURLINFO_HEADER_SIZE);
-        $response->setHeaderAndData($data, $headerSize);
-        if (curl_errno($channel) !== 0) {
-            $response->setErrorMessage(curl_error($channel));
-        }
-        $response->setHttpCode(curl_getinfo($channel, CURLINFO_HTTP_CODE));
-        if ($query->isDetailConnection()) {
-            $response->setDetailConnection(curl_getinfo($channel));
-        }
-        curl_close($channel);
-    }
-
-    /**
-     * @param array $aliases
-     * @param int $requestTime
-     */
-    private function curlMany(array $aliases, $requestTime)
-    {
-        $multiHandler = curl_multi_init();
-
-        //создаем набор дескрипторов cURL
-        $handlers = [];
-        $executor = new Executor();
-        foreach ($aliases as $alias) {
-            $handlers[$alias] = $executor->initRequest($this->queries[$alias], $requestTime);
-            curl_multi_add_handle($multiHandler, $handlers[$alias]);
-        }
-
-        // curl_multi_select($multiHandler, $requestTime / 1000); // ms to s
-
-        //запускаем дескрипторы
-        $runningRequests = null;
-        do {
-            $mrc = curl_multi_exec($multiHandler, $runningRequests);
-        } while ($mrc == CURLM_CALL_MULTI_PERFORM);
-
-        while ($runningRequests && $mrc == CURLM_OK) {
-            if (curl_multi_select($multiHandler, $requestTime / 1000) != -1) {
-                usleep(100);
-            }
-            do {
-                $mrc = curl_multi_exec($multiHandler, $runningRequests);
-            } while ($mrc == CURLM_CALL_MULTI_PERFORM);
-        }
-
-//        do {
-//            curl_multi_exec($multiHandler, $runningRequests);
-//            curl_multi_select($multiHandler);
-//        } while ($runningRequests > 0);
-
-        $this->buildMultiResponse($handlers, $multiHandler);
-        curl_multi_close($multiHandler);
-    }
-
-    /**
-     * @author Valentin Plehanov (Takamura)
-     * @param array $handlers
-     * @param resource $multiHandler
-     */
-    private function buildMultiResponse(array $handlers, $multiHandler)
-    {
-        foreach ($handlers as $alias => $handler) {
-            $response = $this->responses[$alias] = new Response();
-            if (curl_errno($handler) !== 0) {
-                $response->setErrorMessage(curl_error($handler));
-            }
-            $response->setHttpCode(curl_getinfo($handler, CURLINFO_HTTP_CODE));
-            $data = curl_multi_getcontent($handler);
-            $headerSize = curl_getinfo($handler, CURLINFO_HEADER_SIZE);
-            $response->setHeaderAndData($data, $headerSize);
-            /** @var Query $query */
-            $query = $this->queries[$alias];
-            if ($query->isDetailConnection()) {
-                $response->setDetailConnection(curl_getinfo($handler));
-            }
-            // close current handler
-            curl_multi_remove_handle($multiHandler, $handlers[$alias]);
-        }
-    }
 }
 
