@@ -6,7 +6,6 @@
  * Time: 13:45
  */
 
-include_once '../common/head.php';
 include_once '../src/Soliton/Helper.php';
 include_once '../src/Soliton/Soliton.php';
 
@@ -14,7 +13,7 @@ use \Soliton\Helper as H;
 /*
 ------------------------------------------------------------------------------------------------- Sample
 $func = function(\Soliton\Query $query, $responses, $alias) {
-    // dd($responses);
+    // var_dump($responses);
 };
 
 $funcA = function(\Soliton\Response $response) {
@@ -24,27 +23,27 @@ $funcA = function(\Soliton\Response $response) {
 $queries = [
     'data0' => [
         'url' => 'http://test.server.dev/server.php?',
-        'methodType' => 'POST',
-        'methodParams' => ['sleep' => 400000],
+        'method_type' => 'POST',
+        'method_params' => ['sleep' => 400000],
         'options' => [
             CURLOPT_POSTFIELDS => [
                 'value' => 1
             ],
         ],
-        'beforeFunc' => null,
+        'before_func' => null,
     ],
-    'data2' => ['url' => 'http://test.server.dev/server.php?thread1=2', 'methodParams' => ['sleep' => 480000]],
+    'data2' => ['url' => 'http://test.server.dev/server.php?thread1=2', 'method_params' => ['sleep' => 480000]],
     'data1' => [
         'url' => 'http://test.server.dev/server.php',
-        'methodType' => 'POST',
-        'methodParams' => ['sleep' => 200000],
+        'method_type' => 'POST',
+        'method_params' => ['sleep' => 200000],
         'dependency' => ['data0', 'data2'],
-        'beforeFunc' => $func,
-        'afterFunc' => $funcA,
+        'before_func' => $func,
+        'after_func' => $funcA,
     ],
-    'data3' => ['url' => 'http://test.server.dev/server.php', 'dependency' => ['data1'], 'methodParams' => ['sleep' => 50000]],
-    'data4' => ['url' => 'http://test.server.dev/server.php', 'dependency' => ['data3'], 'methodParams' => ['sleep' => 100000]],
-    'data5' => ['url' => 'http://test.server.dev/server.php', 'dependency' => ['data4'], 'methodParams' => ['sleep' => 200000]],
+    'data3' => ['url' => 'http://test.server.dev/server.php', 'dependency' => ['data1'], 'method_params' => ['sleep' => 50000]],
+    'data4' => ['url' => 'http://test.server.dev/server.php', 'dependency' => ['data3'], 'method_params' => ['sleep' => 100000]],
+    'data5' => ['url' => 'http://test.server.dev/server.php', 'dependency' => ['data4'], 'method_params' => ['sleep' => 200000]],
 ];*/
 
 /*
@@ -57,11 +56,11 @@ $beforeAccount = function(\Soliton\Query $query, $responses) {
         if ($data->owner->account->id) {
             $url = str_replace('{id}', $data->owner->account->id, $query->getUrl());
             $query->setUrl($url);
-            $methodParams = [
+            $method_params = [
                 'checksum' => $data->checksum,
                 'auth_token' => $data->auth_token,
             ];
-            $query->addMethodParams($methodParams);
+            $query->addMethodParams($method_params);
         } else {
             $query->setExecutable(false);
         }
@@ -70,7 +69,7 @@ $beforeAccount = function(\Soliton\Query $query, $responses) {
     }
 };
 
-$afterFunc = function (\Soliton\Response $response) {
+$after_func = function (\Soliton\Response $response) {
     if ($response->isCorrect()) {
         $data = $response->getData();
         $response->setData(json_decode($data));
@@ -83,8 +82,8 @@ $afterFunc = function (\Soliton\Response $response) {
 $query = [
     'login' => [
         'url' => 'https://server.angara.dev/api-signin?expand=owner,owner.account',
-        'detailConnection' => false,
-        'methodParams' => [
+        'detail_connection' => false,
+        'method_params' => [
             'email' => 'plehanov.v@gmail.com',
             'password' => 123,
             'checksum' => 1234567,
@@ -94,13 +93,13 @@ $query = [
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => 0,
         ],
-        'afterFunc' => [$afterFunc],
+        'after_func' => [$after_func],
     ],
     'account' => [
         'url' => 'https://server.angara.dev/v1/accounts/{id}',
-        'detailConnection' => true,
+        'detail_connection' => true,
         'dependency' => ['login'],
-        'methodParams' => [
+        'method_params' => [
             'expand' => 'owners,companies',
             'company.is_active' => true,
         ],
@@ -108,8 +107,8 @@ $query = [
             CURLOPT_SSL_VERIFYPEER => false,
             CURLOPT_SSL_VERIFYHOST => 0,
         ],
-        'beforeFunc' => $beforeAccount,
-        'afterFunc' => [$afterFunc],
+        'before_func' => $beforeAccount,
+        'after_func' => [$after_func],
     ],
 
 ];
@@ -122,7 +121,7 @@ $data = $handler
 
 /** @var \Soliton\Response $acc * /
 $acc = $data['account'];
-dd($acc->getDetailConnection());
+var_dump($acc->getDetailConnection());
 */
 
 /* --------------------------------------------------------------------------------- Sample */
@@ -185,7 +184,7 @@ $data = $handler
     ->get([], false);
 
 
-dd(
+var_dump(
     $data['test1'],
     $data['test1a']
 );
@@ -220,16 +219,16 @@ $queries = [
     ],
     'data1' => [
         'url' => 'http://test.server.dev/server.php?',
-        'methodType' => 'POST',
-//        'detailConnection' => true,
-        'loadingHeaders' => true,
-        'methodParams' => ['sleep' => 6, 'data' => 'files'],
+        'method_type' => 'POST',
+//        'detail_connection' => true,
+        'loading_headers' => true,
+        'method_params' => ['sleep' => 6, 'data' => 'files'],
         'options' => [
             CURLOPT_POSTFIELDS => [
                 'value' => 1
             ],
         ],
-        //'beforeFunc' => $beforeAccount,
+        //'before_func' => $beforeAccount,
     ],
 ];
 
@@ -239,6 +238,6 @@ $data = $handler
     ->timeout(100000)
     ->get([], false);
 
- dd($data['data0']->isCorrect());
+ var_dump($data['data0']->isCorrect());
 
 */

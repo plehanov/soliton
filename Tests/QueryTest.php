@@ -11,12 +11,12 @@ class QueryTest extends PHPUnit_Framework_TestCase
     {
         $options = [
             'url' => 'http://test.local?',
-            'methodType' => 'GET',
+            'method_type' => 'GET',
             'dependency' => ['A', 'B'],
             'executable' => true,
-            'beforeFunc' => function () {},
-            'afterFunc' => function () {},
-            'methodParams' => [],
+            'before_func' => function () {},
+            'after_func' => function () {},
+            'method_params' => [],
             'options' => [
                 'opt1' => 'a',
                 'opt2' => 'b',
@@ -25,10 +25,10 @@ class QueryTest extends PHPUnit_Framework_TestCase
         $query = new \Soliton\Query('test', $options);
 
         $this->assertEquals($query->isExecutable(), $options['executable'], '1 Query params error');
-        $this->assertEquals($query->getMethodType(), strtolower($options['methodType']), '2 Query params error');
+        $this->assertEquals($query->getMethodType(), strtolower($options['method_type']), '2 Query params error');
         $this->assertEquals($query->getDependency(), $options['dependency'], '3 Query params error');
-        $this->assertEquals($query->getBeforeFunc(), [$options['beforeFunc']], '4 Query params error');
-        $this->assertEquals($query->getAfterFunc(), [$options['afterFunc']], '5 Query params error');
+        $this->assertEquals($query->getBeforeFunc(), [$options['before_func']], '4 Query params error');
+        $this->assertEquals($query->getAfterFunc(), [$options['after_func']], '5 Query params error');
         $this->assertEquals($query->getFullUrl(), $options['url'], '6 Query params error');
 
         $query->setUrl('http://test.local');

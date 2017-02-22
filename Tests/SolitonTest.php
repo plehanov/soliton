@@ -8,54 +8,55 @@
 class SolitonTest extends PHPUnit_Framework_TestCase
 {
 
+    protected $server_url = 'http://localhost:8080';
+
     public function testSoliton()
     {
         $func = function(\Soliton\Query $query, $responses) {
-            // dd($responses);
+            // var_dump($responses);
         };
         $funcA = function(\Soliton\Response $response) {
             // $response->setErrorMessage('1');
         };
 
-        $url = 'http://localhost:8080';
         $queries = [
             'data0' => [
-                'url' => $url . '/server.php?',
-                'methodType' => 'POST',
-                'methodParams' => ['sleep' => 400000],
+                'url' => $this->server_url,
+                'method_type' => 'POST',
+                'method_params' => ['sleep' => 400000],
                 'options' => [
                     CURLOPT_POSTFIELDS => [
                         'value' => 1
                     ],
                 ],
-                'beforeFunc' => null,
+                'before_func' => null,
             ],
             'data2' => [
-                'url' => $url . '/server.php?thread1=2',
-                'methodParams' => ['sleep' => 480000]
+                'url' => $this->server_url . '?thread1=2',
+                'method_params' => ['sleep' => 480000]
             ],
             'data1' => [
-                'url' => $url . '/server.php',
-                'methodType' => 'POST',
-                'methodParams' => ['sleep' => 200000],
+                'url' => $this->server_url,
+                'method_type' => 'POST',
+                'method_params' => ['sleep' => 200000],
                 'dependency' => ['data0', 'data2'],
-                'beforeFunc' => $func,
-                'afterFunc' => $funcA,
+                'before_func' => $func,
+                'after_func' => $funcA,
             ],
             /*'data3' => [
-                'url' => $url . '/server.php',
+                'url' => $this->server_url,
                 'dependency' => ['data1'],
-                'methodParams' => ['sleep' => 50000]
+                'method_params' => ['sleep' => 50000]
             ],
             'data4' => [
-                'url' => $url . '/server.php',
+                'url' => $this->server_url,
                 'dependency' => ['data3'],
-                'methodParams' => ['sleep' => 100000]
+                'method_params' => ['sleep' => 100000]
             ],
             'data5' => [
-                'url' => $url . '/server.php',
+                'url' => $this->server_url,
                 'dependency' => ['data4'],
-                'methodParams' => ['sleep' => 200000]
+                'method_params' => ['sleep' => 200000]
             ],*/
         ];
 
@@ -66,40 +67,19 @@ class SolitonTest extends PHPUnit_Framework_TestCase
         $this->assertCount(count($queries), $result, '2 Soliton result is empty');
     }
 
-    public function testExceptionTime()
-    {
-        try {
-            $url = 'http://localhost:8080';
-            $queries = [
-                'data2' => [
-                    'url' => $url . '/server.php?thread1=2',
-                    'methodParams' => ['sleep' => 480000]
-                ],
-            ];
-
-            $handler = new \Soliton\Soliton($queries, 0, 0);
-            $this->$handler->get();
-            $this->fail('Trouble with - "Total time" or "percent loop" mast not be zero.');
-        } catch (Exception $e) {
-            $this->assertEquals(4096, $e->getCode());
-            // $this->assertEquals('Object of class Soliton\Soliton could not be converted to string', $e->getMessage());
-        }
-    }
-
     public function testExceptionLoop()
     {
         try {
-            $url = 'http://localhost:8080';
             $queries = [
                 'data4' => [
-                    'url' => $url . '/server.php',
+                    'url' => $this->server_url,
                     'dependency' => ['data5'],
-                    'methodParams' => ['sleep' => 100000]
+                    'method_params' => ['sleep' => 100000]
                 ],
                 'data5' => [
-                    'url' => $url . '/server.php',
+                    'url' => $this->server_url,
                     'dependency' => ['data4'],
-                    'methodParams' => ['sleep' => 200000]
+                    'method_params' => ['sleep' => 200000]
                 ],
             ];
 
@@ -113,12 +93,11 @@ class SolitonTest extends PHPUnit_Framework_TestCase
 
     public function testRequest()
     {
-        $url = 'http://localhost:8080';
         $queries = [
             'data4' => [
-                'url' => $url . '/server.php',
-                'methodParams' => ['sleep' => 1000],
-                'detailConnection' => true,
+                'url' => $this->server_url,
+                'method_params' => ['sleep' => 1000],
+                'detail_connection' => true,
             ]
         ];
 
@@ -130,29 +109,28 @@ class SolitonTest extends PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Soliton\Response', $responses['data4'], 'Not correct class');
         /** @var \Soliton\Response $response */
         $response = $responses['data4'];
-        $this->assertEquals((int)$response->getData(), (int)$queries['data4']['methodParams']['sleep'], 'Not correct data');
+        $this->assertEquals((int)$response->getData(), (int)$queries['data4']['method_params']['sleep'], 'Not correct data');
     }
 
     public function testResponse()
     {
-        $url = 'http://localhost:8080';
         $queries = [
             'data4' => [
-                'url' => $url . '/server.php',
+                'url' => $this->server_url,
                 'dependency' => [],
-                'methodParams' => ['sleep' => 100000],
-                'detailConnection' => true,
+                'method_params' => ['sleep' => 100000],
+                'detail_connection' => true,
             ],
             'data5' => [
-                'url' => $url . '/server.php',
+                'url' => $this->server_url,
                 'dependency' => ['data4'],
-                'methodParams' => ['sleep' => 200000],
+                'method_params' => ['sleep' => 200000],
             ],
             'data6' => [
-                'url' => $url . '/server.php',
+                'url' => $this->server_url,
                 'dependency' => ['data4'],
-                'methodParams' => ['sleep' => 200000],
-                'detailConnection' => true,
+                'method_params' => ['sleep' => 200000],
+                'detail_connection' => true,
             ],
         ];
 

@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <!-- http://www.phpunit.de/manual/current/en/appendixes.configuration.html -->
 <phpunit
         colors="true"
@@ -21,8 +19,8 @@
     </testsuites>
 
     <logging>
-        <!--<log type="coverage-clover" target="report/phpunit.coverage.xml"/>-->
-        <!--<log type="junit" target="report/phpunit.xml" logIncompleteSkipped="false"/>-->
+        <log type="coverage-clover" target="report/phpunit.coverage.xml"/>
+        <log type="junit" target="report/phpunit.xml" logIncompleteSkipped="false"/>
     </logging>
 
 </phpunit>

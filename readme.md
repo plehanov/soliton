@@ -1,8 +1,10 @@
 #Multi Curl
 
 [![Latest Stable Version](https://poser.pugx.org/plehanov/soliton/v/stable)](https://packagist.org/packages/plehanov/soliton)
-[![Test Coverage](https://codeclimate.com/github/plehanov/soliton/badges/coverage.svg)](https://codeclimate.com/github/plehanov/soliton/coverage)
 [![Total Downloads](https://poser.pugx.org/plehanov/soliton/downloads)](https://packagist.org/packages/plehanov/soliton) [![License](https://poser.pugx.org/plehanov/soliton/license)](https://packagist.org/packages/plehanov/soliton)
+[![Code Climate](https://codeclimate.com/github/plehanov/soliton/badges/gpa.svg)](https://codeclimate.com/github/plehanov/soliton)
+[![Test Coverage](https://codeclimate.com/github/plehanov/soliton/badges/coverage.svg)](https://codeclimate.com/github/plehanov/soliton/coverage)
+[![Issue Count](https://codeclimate.com/github/plehanov/soliton/badges/issue_count.svg)](https://codeclimate.com/github/plehanov/soliton)
 
 
 Allows parallel queries. Queries can be constructed in the form of a chain, with dependencies on the results of the previous ones.
@@ -20,10 +22,9 @@ For example the result of the authorization passes the token to other requests.
 ## Testing
 
 ```php
-php -S localhost:8080 sample/ 
+php -S localhost:8080 help/server.php 
 phpunit
 ```
-
 
 
 ## Usage
