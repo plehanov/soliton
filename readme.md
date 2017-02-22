@@ -1,8 +1,10 @@
 #Multi Curl
 
-Why?
+Allows parallel queries. Queries can be constructed in the form of a chain, with dependencies on the results of the previous ones.
+Soliton itself divides into groups and processes requests.
+It is possible to set the overall timeout on the whole process. He balances the distribution of time.
 
-I wanted to write something for fun. Until I put a more reasonable explanation here - assume EXPERIMENTAL status and use at your own risk!
+For example the result of the authorization passes the token to other requests.
 
 ## Install
 
